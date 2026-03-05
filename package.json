@@ -61,5 +61,8 @@
     "ts-jest": "^29.4.6",
     "ts-loader": "^9.4.4",
     "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
