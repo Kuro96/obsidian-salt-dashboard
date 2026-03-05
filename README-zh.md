@@ -23,6 +23,7 @@
 开启插件后，你可以进入设置页面进行个性化调整。
 
 **全局设置：**
+
 - **开启自启**: 勾选 `Open Dashboard on Startup`，每次打开 Obsidian 时仪表盘会自动弹出。
 - **待办数据源**: 填入 `TODO Source Folder`。你的所有待办文件都会存在这个文件夹里。
 - **全局过滤**: 使用 `Global Filter` 排除不需要的文件。语法类似 Dataview，比如 `(-"Templates")` 可以过滤掉模板文件夹。
@@ -35,11 +36,13 @@
 你可以通过按 `Ctrl/Cmd + P` 打开命令面板，输入 `Salt Dashboard: Open Dashboard` 来手动打开面板。也可以点击左侧边栏的专属图标。
 
 **布局调整：**
+
 - **拖动模块**: 鼠标按住模块右上角的**拖拽手柄（Grip 图标）**即可拖动。我们限制了只能通过手柄拖动，这样你复制模块里的文字时就不会误触。
 - **调整大小**: 鼠标放在模块的边缘或右下角，拉动即可改变模块的宽和高。
 - **重置布局**: 如果你不小心把界面弄乱了，去设置页面点击 `Reset to Default Layout` 就能一键恢复。
 
 **内置模块介绍：**
+
 1. **日期与进度 (Date Progress)**: 看当天的日期，了解今年、本周过了多少。你还可以开启统计，看看库里每天新建和修改了多少笔记。
 2. **活跃度热力图 (Contribution Graph)**: 类似 GitHub 的绿色方块图。你可以直观看到自己每天的任务完成情况。点击小方块可以查看当天的任务详情。
 3. **三种待办模块 (Todo)**:
@@ -53,6 +56,7 @@
 ## 更多文档
 
 如果你想了解更详细的配置指南、架构设计或是开发细节，请查看 [`docs/`](docs/) 目录下的文档：
+
 - [用户指南](docs/user-guide-zh.md)
 - [架构说明](docs/architecture.md)
 - [如何编写自定义插件](docs/how-to-write-a-gist-plugin.md)
@@ -77,7 +81,9 @@ const WeatherCard = () => {
 
   // 在这里请求天气 API
   useEffect(() => {
-    fetch('https://api.open-meteo.com/v1/forecast?latitude=35.68&longitude=139.69&current_weather=true')
+    fetch(
+      'https://api.open-meteo.com/v1/forecast?latitude=35.68&longitude=139.69&current_weather=true'
+    )
       .then(res => res.json())
       .then(json => setData(json.current_weather));
   }, []);
@@ -94,28 +100,32 @@ const WeatherCard = () => {
 
 // 2. 导出模块配置
 module.exports = {
-  id: 'weather-gist-card',       // 模块的唯一 ID
-  title: '天气预报',              // 模块名称
-  icon: 'sun',                   // 图标
-  defaultSettings: {             // 默认的设置数据
-    'weather-gist': { lat: '35.68', long: '139.69' }
+  id: 'weather-gist-card', // 模块的唯一 ID
+  title: '天气预报', // 模块名称
+  icon: 'sun', // 图标
+  defaultSettings: {
+    // 默认的设置数据
+    'weather-gist': { lat: '35.68', long: '139.69' },
   },
-  defaultLayout: {               // 默认大小
-    w: 4, h: 8, showTitle: false
+  defaultLayout: {
+    // 默认大小
+    w: 4,
+    h: 8,
+    showTitle: false,
   },
-  component: WeatherCard,        // 绑定的 React 组件
+  component: WeatherCard, // 绑定的 React 组件
   // 3. (可选) 渲染对应的设置项
   renderSettings: (containerEl, plugin, settings) => {
     containerEl.createEl('h3', { text: '天气设置' });
-    
+
     const config = settings['weather-gist'];
-    new Setting(containerEl)
-      .setName('纬度')
-      .addText(text => text.setValue(config.lat).onChange(async v => {
+    new Setting(containerEl).setName('纬度').addText(text =>
+      text.setValue(config.lat).onChange(async v => {
         config.lat = v;
         await plugin.saveSettings();
-      }));
-  }
+      })
+    );
+  },
 };
 ```
 

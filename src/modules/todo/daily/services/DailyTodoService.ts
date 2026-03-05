@@ -93,7 +93,9 @@ export class DailyTodoService extends TodoBaseService {
         }
 
         const isDue = crontabExpr ? CrontabParser.match(crontabExpr, new Date()) : true;
-        const nextTriggerDate = crontabExpr ? CrontabParser.nextTrigger(crontabExpr, new Date()) : null;
+        const nextTriggerDate = crontabExpr
+          ? CrontabParser.nextTrigger(crontabExpr, new Date())
+          : null;
 
         const isPinned = statusChar === '!';
         const isCompleted = completedTasks.includes(text) || statusChar === 'x';
@@ -226,7 +228,7 @@ export class DailyTodoService extends TodoBaseService {
   private async getDailyFile(create = false): Promise<TFile | null> {
     const folderPath = this.config.todoSourceFolder || 'TODO';
     const path = `${folderPath}/${this.config.dailyFileName}`;
-    
+
     let file = this.app.vault.getAbstractFileByPath(path);
 
     if (!file && create) {

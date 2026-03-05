@@ -40,18 +40,18 @@ export class HomepageSettingTab extends PluginSettingTab {
           .onChange(async value => {
             this.plugin.settings.language = value;
             await this.plugin.saveSettings();
-            
+
             // Reload i18n to take immediate effect if possible
             let newLng = value;
             if (value === 'system') {
               newLng = moment.locale();
               if (newLng === 'en') {
-                 const saved = window.localStorage.getItem('language');
-                 if (saved) newLng = saved;
+                const saved = window.localStorage.getItem('language');
+                if (saved) newLng = saved;
               }
             }
             await i18n.changeLanguage(newLng);
-            
+
             // Re-render settings tab to reflect new language immediately
             this.display();
           });

@@ -191,7 +191,8 @@ export const DailyTodo: React.FC = () => {
                     <span>{getCronLabel(task.crontab.raw, t)}</span>
                     {!task.isDue && task.nextTriggerDate && (
                       <span style={{ opacity: 0.6, fontSize: '0.9em' }}>
-                        ({t('modules.todo.daily.nextTrigger')}: {getLocalizedMoment(task.nextTriggerDate).format('MM-DD')})
+                        ({t('modules.todo.daily.nextTrigger')}:{' '}
+                        {getLocalizedMoment(task.nextTriggerDate).format('MM-DD')})
                       </span>
                     )}
                   </div>

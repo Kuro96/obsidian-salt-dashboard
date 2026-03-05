@@ -92,9 +92,7 @@ export class RecentFilesService {
 
       switch (sortBy) {
         case 'name':
-          return sortOrder === 'desc'
-            ? b.name.localeCompare(a.name)
-            : a.name.localeCompare(b.name);
+          return sortOrder === 'desc' ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
         case 'created':
           valA = a.ctime;
           valB = b.ctime;

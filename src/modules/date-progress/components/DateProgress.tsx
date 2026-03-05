@@ -102,7 +102,7 @@ export const DateProgress: React.FC = () => {
                 <span className="dp-stat-label">{t('modules.dateProgress.stats.modDay')}</span>
               </div>
             </div>
-            
+
             <div className="dp-stat-group week">
               <div className="dp-stat-item">
                 <span className="dp-stat-val">+{stats.createdThisWeek}</span>

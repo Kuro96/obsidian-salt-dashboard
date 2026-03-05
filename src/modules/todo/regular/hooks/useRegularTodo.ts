@@ -27,7 +27,8 @@ export const useRegularTodo = () => {
   const [loading, setLoading] = useState(true);
 
   const { updateSettings } = useSettings();
-  const sortBy = (settings.regularTodo.sortBy as 'default' | 'name' | 'modified' | 'created') || 'default';
+  const sortBy =
+    (settings.regularTodo.sortBy as 'default' | 'name' | 'modified' | 'created') || 'default';
   const sortOrder = settings.regularTodo.sortOrder || 'asc';
   const statusFilters = settings.regularTodo.statusFilters || ['active'];
 

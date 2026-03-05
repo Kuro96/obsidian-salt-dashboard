@@ -95,8 +95,8 @@ export default {
         saveSchedule: '拯救时间表',
         nextTrigger: '下一个',
         filter: {
-          today: "今天的任务",
-          future: "非今天的任务",
+          today: '今天的任务',
+          future: '非今天的任务',
         },
       },
       jottings: {
@@ -243,7 +243,7 @@ export default {
         dateFormat: { name: '枣子格式', desc: '为了日常锉刀的格式 (例如 YYMMDD)。' },
         autoCreate: {
           name: '汽车创造锉刀',
-          desc: "创造今天的锉刀如果丢失当检查任务时。",
+          desc: '创造今天的锉刀如果丢失当检查任务时。',
         },
       },
       jottingsTodo: {

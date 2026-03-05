@@ -21,7 +21,8 @@ export const useJottingsTodo = () => {
   const [loading, setLoading] = useState(true);
 
   const { updateSettings } = useSettings();
-  const sortBy = (settings.jottingsTodo.sortBy as 'default' | 'name' | 'modified' | 'created') || 'default';
+  const sortBy =
+    (settings.jottingsTodo.sortBy as 'default' | 'name' | 'modified' | 'created') || 'default';
   const sortOrder = settings.jottingsTodo.sortOrder || 'asc';
   const statusFilters = settings.jottingsTodo.statusFilters || ['active'];
 

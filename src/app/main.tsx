@@ -89,7 +89,7 @@ export default class HomepagePlugin extends Plugin {
     // Merge core defaults, module defaults, and user data
     const moduleDefaults = registry.getAllDefaultSettings();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, moduleDefaults, await this.loadData());
-    
+
     // Apply language setting
     if (this.settings.language && this.settings.language !== 'system') {
       await i18n.changeLanguage(this.settings.language);

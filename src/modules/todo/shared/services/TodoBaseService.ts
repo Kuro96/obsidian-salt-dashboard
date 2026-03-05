@@ -48,10 +48,14 @@ export abstract class TodoBaseService {
           comparison = a.text.localeCompare(b.text);
           break;
         case 'modified':
-          comparison = (a.sourceFile ? getFileMtime(this.app, a.sourceFile) : 0) - (b.sourceFile ? getFileMtime(this.app, b.sourceFile) : 0);
+          comparison =
+            (a.sourceFile ? getFileMtime(this.app, a.sourceFile) : 0) -
+            (b.sourceFile ? getFileMtime(this.app, b.sourceFile) : 0);
           break;
         case 'created':
-          comparison = (a.sourceFile ? getFileCtime(this.app, a.sourceFile) : 0) - (b.sourceFile ? getFileCtime(this.app, b.sourceFile) : 0);
+          comparison =
+            (a.sourceFile ? getFileCtime(this.app, a.sourceFile) : 0) -
+            (b.sourceFile ? getFileCtime(this.app, b.sourceFile) : 0);
           break;
         case 'default':
         default:

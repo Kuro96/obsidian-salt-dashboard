@@ -84,7 +84,7 @@ export class CrontabParser {
   static nextTrigger(expr: CrontabExpression, fromDate: Date = new Date()): Date | null {
     // 采用带"月份快进"的步进算法
     const m = moment(fromDate).add(1, 'day');
-    
+
     // 限制最大查找范围（例如3年，防止 2月29日+特定星期 导致死循环）
     for (let i = 0; i < 1095; i++) {
       // 优化：如果当前月份不匹配，直接跳到下个月1号，大幅减少循环次数
@@ -98,7 +98,7 @@ export class CrontabParser {
       }
       m.add(1, 'day');
     }
-    
+
     return null;
   }
 

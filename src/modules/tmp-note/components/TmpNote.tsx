@@ -21,7 +21,10 @@ export const TmpNote: React.FC = () => {
       </div>
 
       <div className="tn-header" style={{ padding: '12px 12px 0 12px', flexShrink: 0 }}>
-        <h3 className="tn-title" style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-normal)' }}>
+        <h3
+          className="tn-title"
+          style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-normal)' }}
+        >
           {t('modules.settings.tmpNote.title')}
         </h3>
       </div>

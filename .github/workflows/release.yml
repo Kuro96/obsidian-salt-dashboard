@@ -31,7 +31,7 @@ jobs:
       - name: Stage Release Files
         run: |
           mkdir -p release_assets
-          
+
           # Plugin Core Files (based on esbuild.config.mjs copying to build/)
           cp build/main.js release_assets/
           cp manifest.json release_assets/
@@ -42,7 +42,7 @@ jobs:
           cp release_assets/main.js release_assets/obsidian-salt-dashboard/
           cp release_assets/manifest.json release_assets/obsidian-salt-dashboard/
           if [ -f release_assets/styles.css ]; then cp release_assets/styles.css release_assets/obsidian-salt-dashboard/; fi
-          
+
           cd release_assets
           zip -r obsidian-salt-dashboard.zip obsidian-salt-dashboard/
 
