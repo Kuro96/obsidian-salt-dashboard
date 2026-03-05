@@ -1,0 +1,273 @@
+/* Todo Item Styles */
+.task-list {
+  overscroll-behavior: contain;
+  position: relative;
+}
+
+.todoItem {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+  transition: background-color 0.2s;
+}
+
+.todoItem:hover {
+  background-color: var(--background-primary-alt);
+}
+
+.checkbox {
+  margin-right: 8px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.content {
+  flex: 1;
+  word-break: break-word;
+  color: var(--text-normal);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.completed .content {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.abandoned .content {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.abandoned .checkbox {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-left: 8px;
+}
+
+.todoItem:hover .actions {
+  opacity: 1;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  color: var(--text-muted);
+  opacity: 0.7;
+  transition: all 0.2s;
+  font-size: 14px;
+  /* Ensure square buttons */
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.actionBtn:hover {
+  opacity: 1;
+  color: var(--text-normal);
+  transform: scale(1.1);
+}
+
+.pinned {
+  color: var(--interactive-accent);
+  opacity: 1;
+}
+
+.actionBtn.confirm-btn {
+  color: var(--interactive-success);
+  font-weight: bold;
+}
+
+@media (hover: none) {
+  .actions {
+    opacity: 1;
+  }
+}
+
+/* TodoItem Edit Styles */
+.edit-input {
+  width: 100%;
+  background: var(--background-primary);
+  border: 1px solid var(--interactive-accent);
+  color: var(--text-normal);
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 14px;
+  outline: none;
+}
+
+/* Add Task UI */
+.add-task-container {
+  margin-top: 12px;
+  position: relative;
+  z-index: 10;
+}
+
+.add-task-btn {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px dashed var(--text-muted);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 13px;
+}
+
+.add-task-btn:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+
+.add-task-input {
+  width: 100%;
+  padding: 8px;
+  background: var(--background-primary);
+  border: 1px solid var(--interactive-accent);
+  color: var(--text-normal);
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+}
+
+/* Daily Todo Add UI */
+.daily-add-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  position: relative;
+}
+
+.task-text-input {
+  flex: 2;
+}
+
+.cron-input-wrapper {
+  flex: 1;
+  position: relative;
+  min-width: 80px;
+}
+
+.cron-text-input {
+  font-family: monospace;
+  text-align: center;
+}
+
+.confirm-add-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--interactive-success);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  position: relative; /* Ensure z-index works */
+  z-index: 101; /* Above resize handle (z-100) */
+}
+
+.confirm-add-btn:hover {
+  border-color: var(--interactive-success);
+  background: var(--background-modifier-hover);
+}
+
+/* Task Cycle Badge */
+.task-cycle-badge {
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.6;
+  background: var(--background-primary);
+  padding: 2px 4px;
+  border-radius: 4px;
+  white-space: nowrap; /* Fix width issue */
+  z-index: 5; /* Ensure it's above some elements but below popups */
+  display: inline-block;
+}
+
+.task-cycle-badge.clickable {
+  cursor: pointer;
+}
+
+.task-cycle-badge.clickable:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Show badge when row is hovered */
+.todoItem:hover + div .task-cycle-badge,
+.task-cycle-badge:hover {
+  opacity: 1;
+}
+
+/* 容器 */
+.cron-input-wrapper {
+  position: relative;
+  display: flex; /* Better for layout */
+  align-items: center;
+}
+
+/* Cron Editor Container (Fixes overlap and alignment) */
+.cron-editor-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Lift above text */
+}
+
+/* Cron Input Field (Replaces Tailwind classes) */
+.cron-input-field {
+  background: var(--background-primary-alt);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 0 8px;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  height: 24px; /* Match button height */
+  width: 140px;
+  outline: none;
+}
+
+.cron-input-field:focus {
+  border-color: var(--interactive-accent);
+  background: var(--background-primary);
+}
+
+/* Ensure menu is ABOVE the input too */
+/* The .cron-presets-menu definition at the top of file handles this (bottom: 100%) */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "salt-dashboard",
+  "name": "Salt Dashboard",
+  "version": "0.1.0",
+  "minAppVersion": "0.15.0",
+  "description": "A comprehensive dashboard for Obsidian.",
+  "author": "Kuro Latency",
+  "authorUrl": "",
+  "fundingUrl": "",
+  "isDesktopOnly": false
+}

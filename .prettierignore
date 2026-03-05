@@ -1,0 +1,7 @@
+node_modules
+dist
+build
+coverage
+.husky
+*.log
+.DS_Store

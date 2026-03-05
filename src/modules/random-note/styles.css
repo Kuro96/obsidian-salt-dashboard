@@ -1,0 +1,41 @@
+/* Random Note Module */
+.random-note-module {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* position: relative; removed to allow header actions to position relative to parent DraggableModule */
+}
+
+.rn-content {
+  flex: 1;
+  padding: 8px;
+  border-radius: 4px;
+  background: var(--background-primary);
+  transition: background 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rn-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: var(--interactive-accent);
+}
+
+.rn-preview {
+  font-size: 13px;
+  color: var(--text-normal);
+  line-height: 1.5;
+  flex: 1;
+  overflow-y: auto; /* Enable scroll */
+  /* Removed line clamping to allow scrolling */
+}
+
+.rn-meta {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0; /* Prevent shrinking */
+}

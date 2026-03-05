@@ -1,0 +1,49 @@
+/* Global styles for the Obsidian Homepage Dashboard */
+
+.dashboard-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Markdown Content Styling */
+.markdown-rendered {
+  -webkit-user-select: text;
+  user-select: text;
+}
+.markdown-rendered p {
+  margin: 0;
+  padding: 0;
+}
+.markdown-rendered a {
+  color: var(--text-accent);
+  text-decoration: none;
+}
+.markdown-rendered a:hover {
+  text-decoration: underline;
+}
+
+/* Global Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-active-thumb-bg);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

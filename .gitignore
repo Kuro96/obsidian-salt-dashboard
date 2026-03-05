@@ -1,0 +1,17 @@
+# OS & Editors
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Node.js
+**/node_modules/
+npm-debug.log
+yarn-error.log
+node_modules/
+build/
+
+docs/refactor.md
+AGENTS.md
+lessons.md
+progress.txt

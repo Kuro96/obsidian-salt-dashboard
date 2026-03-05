@@ -1,0 +1,35 @@
+/* Tmp Note Module */
+.tmp-note-module {
+  height: 100%; /* Fill container */
+  background: var(--background-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* position: relative; removed */
+}
+
+.tn-body {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Contain scroll */
+}
+
+.tn-content {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  flex: 1;
+  overflow-y: auto; /* Enable scroll */
+  margin-bottom: 8px;
+  font-family: var(--font-monospace);
+}
+
+.tn-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+}

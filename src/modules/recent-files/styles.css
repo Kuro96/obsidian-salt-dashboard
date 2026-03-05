@@ -1,0 +1,244 @@
+/* Recent Files Module */
+.recent-files-module {
+  height: 100%;
+  overflow-y: auto; /* Scroll at module level */
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.recent-files-module.no-main-title {
+  padding-top: 24px;
+}
+
+.rf-grid {
+  display: grid;
+  /* grid-template-columns: handled by JS */
+  gap: 12px 16px;
+  height: auto; /* Let it grow */
+  padding-bottom: 8px;
+}
+
+.rf-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  height: auto; /* Natural height */
+}
+
+.rf-header {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-normal);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+
+  /* Sticky Header */
+  position: sticky;
+  top: 0;
+  background-color: var(--background-secondary); /* Match module bg */
+  z-index: 5;
+  padding-top: 4px; /* Slight padding for visual separation if scrolled */
+}
+
+.rf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* Removed overflow-y: auto */
+  flex: none; /* Don't stretch */
+  min-height: 0;
+}
+
+.rf-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--background-primary);
+  border: 1px solid transparent;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+}
+
+.rf-item:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-primary-alt);
+}
+
+.rf-item-name {
+  font-size: 13px;
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.rf-item-meta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 24px;
+}
+
+.rf-item-size {
+  width: 45px;
+  text-align: right;
+  opacity: 0.8;
+}
+
+.rf-item-date {
+  width: 65px;
+  text-align: right;
+  transition: opacity 0.2s;
+}
+
+.rf-item-date.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rf-item-actions {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.rf-item:hover .rf-item-actions,
+.rf-item-actions.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rf-item:hover .rf-item-date {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rf-action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.rf-action-btn:hover {
+  opacity: 1;
+  color: var(--text-normal);
+  transform: scale(1.1);
+}
+
+.rf-action-btn.pinned {
+  color: var(--interactive-accent);
+  opacity: 1;
+}
+
+.rf-action-btn.confirm-delete {
+  color: var(--interactive-error);
+  font-weight: bold;
+  opacity: 1;
+}
+
+.rf-action-btn.confirm-delete:hover {
+  background: var(--background-modifier-error-hover);
+  transform: scale(1.1);
+}
+
+.rf-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px;
+  text-align: center;
+  font-style: italic;
+}
+
+@media (max-width: 1024px) {
+}
+
+@media (max-width: 640px) {
+}
+
+/* Recent Files Controls */
+.rf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rf-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rf-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rf-control-select {
+  font-size: 10px;
+  padding: 2px 4px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  height: 20px;
+}
+
+.rf-control-btn {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-normal);
+}
+
+.rf-control-btn:hover,
+.rf-control-select:hover {
+  background: var(--background-modifier-hover);
+}

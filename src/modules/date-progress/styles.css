@@ -1,0 +1,388 @@
+/* DateProgress Module specific override */
+.dashboard-module.module-id-date-progress {
+  background: none;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* DateProgress Module */
+.date-progress-module {
+  /* Define container for size queries */
+  container-type: size;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  height: 100%;
+  padding: 20px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    var(--interactive-accent) 0%,
+    var(--interactive-accent-hover) 100%
+  );
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+/* Top Section: Calendar + Progress */
+.dp-top-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+/* Calendar Section */
+.dp-calendar-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  flex: 0 0 auto;
+}
+
+.dp-calendar {
+  display: flex;
+  flex-direction: column;
+  width: 70px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: white;
+  flex-shrink: 0;
+}
+
+.dp-cal-top {
+  background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
+  color: white;
+  text-align: center;
+  padding: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.dp-cal-body {
+  color: #2c3e50;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  background: #fff;
+}
+
+.dp-date-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.dp-weekday {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dp-badges {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dp-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+/* Progress Section */
+.dp-progress-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  flex: 1 1 250px; /* Takes up remaining space but wraps if less than 250px */
+}
+
+.dp-progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: 0.95;
+  font-weight: 600;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dp-progress-bar-bg {
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.dp-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
+  border-radius: 12px;
+  transition: width 1s ease-out;
+}
+
+.dp-progress-text {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 1;
+}
+
+.dp-progress-text.inside {
+  right: 0;
+  justify-content: flex-end;
+  padding-right: 10px;
+  color: var(--interactive-accent);
+}
+
+.dp-progress-text.outside {
+  padding-left: 10px;
+  color: white;
+}
+
+/* Stats Section */
+.dp-stats-card {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 16px;
+  width: 100%;
+}
+
+.dp-stats-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.dp-stat-group {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  flex: 1 1 auto;
+  justify-content: space-around;
+}
+
+.dp-stat-group.total {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dp-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 1 auto;
+  min-width: 50px;
+}
+
+.dp-stat-val {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.dp-stat-label {
+  font-size: 11px;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+/* --- Container Queries --- */
+@container (max-width: 450px) {
+  .date-progress-module {
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .dp-top-section {
+    gap: 16px;
+  }
+
+  .dp-badges {
+    flex-direction: row;
+  }
+
+  .dp-stats-card {
+    padding: 10px 12px;
+  }
+
+  .dp-stats-grid {
+    gap: 8px 12px;
+  }
+
+  .dp-stat-val {
+    font-size: 13px;
+  }
+
+  .dp-stat-label {
+    font-size: 9px;
+  }
+}
+
+@container (max-width: 300px) {
+  .dp-stats-grid {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dp-stat-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@container (max-height: 350px) {
+  .date-progress-module {
+    gap: 16px;
+    padding: 16px;
+  }
+  .dp-top-section {
+    gap: 12px;
+  }
+  .dp-calendar {
+    width: 60px;
+  }
+  .dp-cal-body {
+    font-size: 22px;
+    padding: 6px 0;
+  }
+  .dp-weekday {
+    font-size: 16px;
+  }
+  .dp-stats-card {
+    padding: 8px 12px;
+  }
+}
+
+@container (height < 150px) {
+  .dp-stats-card {
+    display: none;
+  }
+}
+
+/* --- Logical Grid Size Adjustments --- */
+/* These classes are applied dynamically based on the module's layout config (w, h) */
+
+/* Compact Height (e.g. h <= 6) */
+.date-progress-module.dp-compact-h {
+  row-gap: 8px;
+  padding-block: 8px;
+}
+.date-progress-module.dp-compact-h .dp-top-section {
+  row-gap: 8px;
+}
+.date-progress-module.dp-compact-h .dp-calendar {
+  width: 60px;
+}
+.date-progress-module.dp-compact-h .dp-cal-body {
+  font-size: 22px;
+  padding: 6px 0;
+}
+.date-progress-module.dp-compact-h .dp-weekday {
+  font-size: 16px;
+}
+.date-progress-module.dp-compact-h .dp-stats-card {
+  padding: 8px 12px;
+}
+.date-progress-module.dp-compact-h .dp-stats-grid {
+  gap: 8px 12px;
+}
+.date-progress-module.dp-compact-h .dp-stat-group {
+  gap: 8px;
+  padding: 6px 10px;
+}
+.date-progress-module.dp-compact-h .dp-stat-val {
+  font-size: 13px;
+}
+.date-progress-module.dp-compact-h .dp-stat-label {
+  font-size: 9px;
+}
+
+/* Tiny Height (e.g. h <= 4) */
+.date-progress-module.dp-tiny-h .dp-stats-card {
+  display: none !important; /* Force hide if logically tiny */
+}
+
+/* Compact Width (e.g. w <= 5) */
+.date-progress-module.dp-compact-w {
+  padding-inline: 16px;
+  column-gap: 16px;
+}
+.date-progress-module.dp-compact-w .dp-top-section {
+  column-gap: 16px;
+}
+.date-progress-module.dp-compact-w .dp-badges {
+  flex-direction: row;
+}
+
+/* Tiny Width (e.g. w <= 3) */
+.date-progress-module.dp-tiny-w .dp-stats-grid {
+  flex-direction: column;
+  row-gap: 8px;
+}
+.date-progress-module.dp-tiny-w .dp-stat-group {
+  flex-direction: column;
+  row-gap: 8px;
+  padding-inline: 12px;
+  padding-block: 8px;
+}
+.date-progress-module.dp-tiny-w .dp-stat-item {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.date-progress-module.dp-tiny-w .dp-stats-card {
+  display: none !important; /* Often too squeezed, better to hide or make very compact */
+}
+
+/* Wide Width (e.g. w >= 8) */
+.date-progress-module.dp-wide-w {
+  flex-direction: row;
+  align-items: stretch;
+  column-gap: 20px;
+}
+.date-progress-module.dp-wide-w .dp-top-section {
+  width: auto;
+  flex: 2;
+  align-content: center;
+}
+.date-progress-module.dp-wide-w .dp-stats-card {
+  width: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
