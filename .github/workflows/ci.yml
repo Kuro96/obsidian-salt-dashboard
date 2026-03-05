@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup Python & Pre-commit
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Plugin Dependencies
+        run: npm install
+
+      - name: Run Pre-commit Hooks
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files
+
+      - name: Build Plugin
+        run: npm run build
+
+      - name: Archive Plugin Code
+        uses: actions/upload-artifact@v4
+        with:
+          name: obsidian-salt-dashboard
+          path: |
+            build/
+            manifest.json

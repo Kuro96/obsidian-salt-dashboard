@@ -1,0 +1,59 @@
+name: Release Plugin
+
+on:
+  push:
+    tags:
+      - '*' # Trigger on version tags like 0.1.0, v0.1.0, etc.
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    # Needs permission to write releases
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Plugin
+        run: npm run build
+
+      - name: Stage Release Files
+        run: |
+          mkdir -p release_assets
+          
+          # Plugin Core Files (based on esbuild.config.mjs copying to build/)
+          cp build/main.js release_assets/
+          cp manifest.json release_assets/
+          if [ -f build/styles.css ]; then cp build/styles.css release_assets/; fi
+
+          # Create a Zip of the plugin folder for manual installations
+          mkdir -p release_assets/obsidian-salt-dashboard
+          cp release_assets/main.js release_assets/obsidian-salt-dashboard/
+          cp release_assets/manifest.json release_assets/obsidian-salt-dashboard/
+          if [ -f release_assets/styles.css ]; then cp release_assets/styles.css release_assets/obsidian-salt-dashboard/; fi
+          
+          cd release_assets
+          zip -r obsidian-salt-dashboard.zip obsidian-salt-dashboard/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release_assets/main.js
+            release_assets/manifest.json
+            release_assets/styles.css
+            release_assets/obsidian-salt-dashboard.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
