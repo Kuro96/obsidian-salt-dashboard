@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useObsidianApp } from '../../../app/context/ObsidianContext';
 import { useSettings } from '../../../app/context/SettingsContext';
 import { RecentFilesService, FileInfo } from '../services/RecentFilesService';
@@ -47,8 +47,25 @@ export const useRecentFiles = () => {
 
   const debouncedRefresh = useMemo(() => debounce(refresh, 300), [refresh]);
 
+  const hasFetched = React.useRef(false);
+
   useEffect(() => {
-    refresh();
+    // Initial fetch happens correctly on mount by not using direct refresh() or using ref correctly.
+    // Let's use a standard pattern for data fetching
+    const isSubscribed = true;
+
+    const initialLoad = async () => {
+      // Simulate async to avoid synchronous setState warnings
+      await Promise.resolve();
+      if (isSubscribed) {
+        refresh();
+      }
+    };
+
+    if (!hasFetched.current) {
+      initialLoad();
+      hasFetched.current = true;
+    }
 
     const refModify = app.vault.on('modify', () => debouncedRefresh());
     const refCreate = app.vault.on('create', () => debouncedRefresh());

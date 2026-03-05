@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useObsidianApp } from '../../../app/context/ObsidianContext';
 import { useSettings } from '../../../app/context/SettingsContext';
 import { DateProgressService, DateInfo, VaultStats } from '../services/DateProgressService';
@@ -11,8 +11,12 @@ export const useDateProgress = () => {
     return new DateProgressService(app, settings.dateProgress);
   }, [app, settings.dateProgress]);
 
-  const [dateInfo, setDateInfo] = useState<DateInfo | null>(null);
-  const [stats, setStats] = useState<VaultStats | null>(null);
+  const [dateInfo, setDateInfo] = useState<DateInfo | null>(() => service.getDateInfo());
+  const [stats, setStats] = useState<VaultStats | null>(() =>
+    settings.dateProgress.showStats ? service.getStats() : null
+  );
+
+  const hasFetched = React.useRef(false);
 
   const refresh = useCallback(() => {
     setDateInfo(service.getDateInfo());
@@ -22,9 +26,7 @@ export const useDateProgress = () => {
   }, [service, settings.dateProgress.showStats]);
 
   useEffect(() => {
-    refresh();
-
-    // Refresh date info every minute
+    // We already fetch state on mount via lazy init.
     const interval = setInterval(() => {
       setDateInfo(service.getDateInfo());
     }, 60000);
@@ -43,7 +45,7 @@ export const useDateProgress = () => {
       app.vault.offref(refCreate);
       app.vault.offref(refDelete);
     };
-  }, [refresh, app.vault]);
+  }, [refresh, app.vault, service]);
 
   return { dateInfo, stats };
 };

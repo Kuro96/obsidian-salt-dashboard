@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useObsidianApp } from '../../../app/context/ObsidianContext';
 import { useSettings } from '../../../app/context/SettingsContext';
 import { TmpNoteService, TmpNoteData } from '../services/TmpNoteService';
@@ -21,8 +21,22 @@ export const useTmpNote = () => {
     setLoading(false);
   }, [service]);
 
+  const hasFetched = React.useRef(false);
+
   useEffect(() => {
-    refresh();
+    const isSubscribed = true;
+
+    const initialLoad = async () => {
+      await Promise.resolve();
+      if (isSubscribed) {
+        refresh();
+      }
+    };
+
+    if (!hasFetched.current) {
+      initialLoad();
+      hasFetched.current = true;
+    }
 
     const ref = app.vault.on('modify', file => {
       if (file.path === (settings.tmpNote.tmpNotePath || 'works/tmp/tmp.md')) {

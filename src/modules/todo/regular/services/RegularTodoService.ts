@@ -173,8 +173,8 @@ export class RegularTodoService extends TodoBaseService {
       // Use stricter matching to avoid partial matches
       if (/^- \[[ !]\]/.test(line)) {
         lines[idx] = line.replace(/^- \[[ !]\]/, '- [-]') + ` ❌ ${today}`;
-      } else if (/^- \[\-\]/.test(line)) {
-        lines[idx] = line.replace(/^- \[\-\]/, '- [ ]').replace(/ ❌ \d{4}-\d{2}-\d{2}/, '');
+      } else if (/^- \[-]/.test(line)) {
+        lines[idx] = line.replace(/^- \[-]/, '- [ ]').replace(/ ❌ \d{4}-\d{2}-\d{2}/, '');
       }
     });
   }

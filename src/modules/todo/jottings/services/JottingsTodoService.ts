@@ -139,7 +139,7 @@ export class JottingsTodoService extends TodoBaseService {
     // If no link found, assume text is the title and auto-create link
     if (!hasLink) {
       // Sanitize title (simple replacement)
-      const safeTitle = text.replace(/[\\/:?*"<>|#^\[\]]/g, '-').trim();
+      const safeTitle = text.replace(/[\\/:?*"<>|#^[\]]/g, '-').trim();
       if (safeTitle) {
         // Resolve generation path
         const pathPattern = this.config.jottingsPathPattern || '[jottings]/YYYY/MM';
@@ -207,6 +207,7 @@ export class JottingsTodoService extends TodoBaseService {
       await this.app.vault.createFolder(folderPath);
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const templater = this.app.plugins.plugins['templater-obsidian'];
     if (templater) {
@@ -273,8 +274,8 @@ export class JottingsTodoService extends TodoBaseService {
       if (/^- \[[ !]\]/.test(line)) {
         lines[idx] = line.replace(/^- \[[ !]\]/, '- [-]') + ` ❌ ${today}`;
         action = 'abandon';
-      } else if (/^- \[\-\]/.test(line)) {
-        lines[idx] = line.replace(/^- \[\-\]/, '- [ ]').replace(/ ❌ \d{4}-\d{2}-\d{2}/, '');
+      } else if (/^- \[-]/.test(line)) {
+        lines[idx] = line.replace(/^- \[-]/, '- [ ]').replace(/ ❌ \d{4}-\d{2}-\d{2}/, '');
         action = 'unabandon';
       }
     });

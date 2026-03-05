@@ -133,3 +133,4 @@ export const DraggableModule = React.forwardRef<HTMLDivElement, DraggableModuleP
     );
   }
 );
+DraggableModule.displayName = 'DraggableModule';

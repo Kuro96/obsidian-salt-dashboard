@@ -33,7 +33,7 @@ export const SettingsProvider: React.FC<{
   const updateSettings = async (newSettings: Partial<HomepageSettings>) => {
     const updated = JSON.parse(JSON.stringify({ ...settings, ...newSettings }));
     setSettings(updated);
-    plugin.settings = updated;
+    Object.assign(plugin.settings, updated);
     await plugin.saveSettings();
   };
 

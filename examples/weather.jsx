@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* global React */
 const { useState, useEffect } = React;
 const { Setting } = require('obsidian');
 

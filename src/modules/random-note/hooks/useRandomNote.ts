@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useObsidianApp } from '../../../app/context/ObsidianContext';
 import { useSettings } from '../../../app/context/SettingsContext';
 import { RandomNoteService, RandomNoteData } from '../services/RandomNoteService';
@@ -46,11 +46,27 @@ export const useRandomNote = () => {
       }
       setLoading(false);
     },
-    [service, app.vault, settings.globalFilter]
+    [service, app, settings.globalFilter]
   );
 
+  const hasMounted = React.useRef(false);
+
   useEffect(() => {
-    fetchRandomNote();
+    let isSubscribed = true;
+    const init = async () => {
+      await Promise.resolve();
+      if (isSubscribed) {
+        fetchRandomNote();
+      }
+    };
+
+    if (!hasMounted.current) {
+      init();
+      hasMounted.current = true;
+    }
+    return () => {
+      isSubscribed = false;
+    };
   }, [fetchRandomNote]);
 
   const refresh = () => fetchRandomNote(true);
