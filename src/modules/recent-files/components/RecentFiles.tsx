@@ -97,35 +97,58 @@ export const RecentFiles: React.FC = () => {
                 </div>
                 <div className="rf-controls">
                   {creatingNoteColId === col.id ? (
-                    <input
-                      autoFocus
-                      type="text"
-                      className="rf-create-input"
-                      value={newNoteTitle}
-                      onChange={e => setNewNoteTitle(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') handleCreateSubmit(col.id);
-                        if (e.key === 'Escape') {
-                          setCreatingNoteColId(null);
-                          setNewNoteTitle('');
-                        }
-                      }}
-                      onBlur={() => {
-                        // Delay blur slightly to allow click event on other elements
-                        setTimeout(() => {
-                          setCreatingNoteColId(null);
-                          setNewNoteTitle('');
-                        }, 150);
-                      }}
-                      placeholder={t('modules.recentFiles.createPlaceholder', 'Note title...')}
-                      style={{
-                        width: '120px',
-                        padding: '2px 6px',
-                        fontSize: '0.9em',
-                        borderRadius: '4px',
-                        border: '1px solid var(--background-modifier-border)',
-                      }}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <input
+                        autoFocus
+                        type="text"
+                        className="rf-create-input"
+                        value={newNoteTitle}
+                        onChange={e => setNewNoteTitle(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleCreateSubmit(col.id);
+                          if (e.key === 'Escape') {
+                            setCreatingNoteColId(null);
+                            setNewNoteTitle('');
+                          }
+                        }}
+                        placeholder={t('modules.recentFiles.createPlaceholder', 'Note title...')}
+                        style={{
+                          width: '120px',
+                          padding: '2px 6px',
+                          fontSize: '0.9em',
+                          borderRadius: '4px',
+                          border: '1px solid var(--background-modifier-border)',
+                        }}
+                      />
+                      <button
+                        className="clickable-icon"
+                        onClick={() => handleCreateSubmit(col.id)}
+                        aria-label={t('modules.recentFiles.confirmCreate', 'Confirm')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-check"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </button>
+                    </div>
                   ) : (
                     <button
                       className="clickable-icon"
