@@ -16,8 +16,6 @@ export const useDateProgress = () => {
     settings.dateProgress.showStats ? service.getStats() : null
   );
 
-  const hasFetched = React.useRef(false);
-
   const refresh = useCallback(() => {
     setDateInfo(service.getDateInfo());
     if (settings.dateProgress.showStats) {

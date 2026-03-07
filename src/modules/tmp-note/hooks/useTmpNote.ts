@@ -21,22 +21,8 @@ export const useTmpNote = () => {
     setLoading(false);
   }, [service]);
 
-  const hasFetched = React.useRef(false);
-
   useEffect(() => {
-    const isSubscribed = true;
-
-    const initialLoad = async () => {
-      await Promise.resolve();
-      if (isSubscribed) {
-        refresh();
-      }
-    };
-
-    if (!hasFetched.current) {
-      initialLoad();
-      hasFetched.current = true;
-    }
+    Promise.resolve().then(() => refresh());
 
     const ref = app.vault.on('modify', file => {
       if (file.path === (settings.tmpNote.tmpNotePath || 'works/tmp/tmp.md')) {

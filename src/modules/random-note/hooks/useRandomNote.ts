@@ -49,24 +49,8 @@ export const useRandomNote = () => {
     [service, app, settings.globalFilter]
   );
 
-  const hasMounted = React.useRef(false);
-
   useEffect(() => {
-    let isSubscribed = true;
-    const init = async () => {
-      await Promise.resolve();
-      if (isSubscribed) {
-        fetchRandomNote();
-      }
-    };
-
-    if (!hasMounted.current) {
-      init();
-      hasMounted.current = true;
-    }
-    return () => {
-      isSubscribed = false;
-    };
+    Promise.resolve().then(() => fetchRandomNote());
   }, [fetchRandomNote]);
 
   const refresh = () => fetchRandomNote(true);
