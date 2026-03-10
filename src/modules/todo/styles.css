@@ -7,7 +7,7 @@
 .todoItem {
   display: flex;
   align-items: flex-start;
-  padding: 4px 0;
+  padding: 4px 6px;
   border-bottom: 1px solid var(--background-modifier-border);
   transition: background-color 0.2s;
 }
@@ -25,6 +25,7 @@
 }
 
 .checkbox {
+  margin-left: 2px;
   margin-right: 4px;
   cursor: pointer;
   margin-top: 4px;
