@@ -66,6 +66,12 @@
   transition:
     background-color 0.2s,
     border-color 0.2s;
+  border-left: 2px solid transparent;
+}
+
+.rf-item.pinned {
+  background-color: var(--background-primary-alt);
+  border-left-color: var(--interactive-accent);
 }
 
 .rf-item:hover {

@@ -202,7 +202,11 @@ export const RecentFiles: React.FC = () => {
               </div>
               <div className="rf-list">
                 {filesByColumn[col.id]?.map(file => (
-                  <div key={file.path} className="rf-item" onClick={() => openFile(file.path)}>
+                  <div
+                    key={file.path}
+                    className={`rf-item ${file.isPinned ? 'pinned' : ''}`}
+                    onClick={() => openFile(file.path)}
+                  >
                     <a
                       className="rf-item-name internal-link"
                       data-href={file.path}
