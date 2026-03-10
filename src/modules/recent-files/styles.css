@@ -135,45 +135,6 @@
   pointer-events: none;
 }
 
-.rf-action-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  opacity: 0.7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.rf-action-btn:hover {
-  opacity: 1;
-  color: var(--text-normal);
-  transform: scale(1.1);
-}
-
-.rf-action-btn.pinned {
-  color: var(--interactive-accent);
-  opacity: 1;
-}
-
-.rf-action-btn.confirm-delete {
-  color: var(--interactive-error);
-  font-weight: bold;
-  opacity: 1;
-}
-
-.rf-action-btn.confirm-delete:hover {
-  background: var(--background-modifier-error-hover);
-  transform: scale(1.1);
-}
-
 .rf-empty {
   font-size: 12px;
   color: var(--text-muted);

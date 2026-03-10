@@ -7,6 +7,12 @@ import { moment } from 'obsidian';
 import { getLocalizedMoment } from '../../../shared/utils/momentHelper';
 import { SortControls } from '../../../shared/components/SortControls';
 import { SortOption, SortOrder } from '../../../app/types';
+import {
+  PinButton,
+  DeleteButton,
+  ConfirmButton,
+  CancelButton,
+} from '../../../shared/components/ItemActionButtons';
 
 export const RecentFiles: React.FC = () => {
   const { t } = useTranslation();
@@ -231,50 +237,29 @@ export const RecentFiles: React.FC = () => {
                       >
                         {deletingNotePath === file.path ? (
                           <>
-                            <button
-                              className="rf-action-btn confirm-delete"
-                              onClick={e => {
-                                e.stopPropagation();
+                            <ConfirmButton
+                              onClick={() => {
                                 deleteNote(file.path);
                                 setDeletingNotePath(null);
                               }}
                               title={t('modules.todo.shared.item.confirmDelete')}
-                            >
-                              ✓
-                            </button>
-                            <button
-                              className="rf-action-btn cancel"
-                              onClick={e => {
-                                e.stopPropagation();
-                                setDeletingNotePath(null);
-                              }}
+                            />
+                            <CancelButton
+                              onClick={() => setDeletingNotePath(null)}
                               title={t('modules.todo.shared.item.cancel')}
-                            >
-                              ✗
-                            </button>
+                            />
                           </>
                         ) : (
                           <>
-                            <button
-                              className={`rf-action-btn ${file.isPinned ? 'pinned' : ''}`}
-                              onClick={e => {
-                                e.stopPropagation();
-                                togglePin(file.path);
-                              }}
+                            <PinButton
+                              isPinned={file.isPinned || false}
+                              onToggle={() => togglePin(file.path)}
                               title={t('modules.todo.shared.item.pin')}
-                            >
-                              {file.isPinned ? '📌' : '📍'}
-                            </button>
-                            <button
-                              className="rf-action-btn delete"
-                              onClick={e => {
-                                e.stopPropagation();
-                                setDeletingNotePath(file.path);
-                              }}
+                            />
+                            <DeleteButton
+                              onClick={() => setDeletingNotePath(file.path)}
                               title={t('modules.todo.shared.item.delete')}
-                            >
-                              🗑️
-                            </button>
+                            />
                           </>
                         )}
                       </div>

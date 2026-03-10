@@ -1,9 +1,16 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Task } from '../../../../app/types';
 import { MarkdownContent } from '../../../../shared/components/MarkdownContent';
 import { AutoResizeTextarea } from '../../../../shared/components/AutoResizeTextarea';
+import {
+  PinButton,
+  DeleteButton,
+  ConfirmButton,
+  CancelButton,
+  AbandonButton,
+} from '../../../../shared/components/ItemActionButtons';
 
 interface TodoItemProps {
   task: Task;
@@ -59,7 +66,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
   return (
     <div
-      className={`todoItem ${task.completed ? 'completed' : task.isAbandoned ? 'abandoned' : ''}`}
+      className={`todoItem ${task.isPinned ? 'pinned' : ''} ${task.completed ? 'completed' : task.isAbandoned ? 'abandoned' : ''}`}
     >
       <input
         type="checkbox"
@@ -92,79 +99,50 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
       <div className="actions">
         {isEditing ? (
-          <button
-            className="actionBtn confirm-btn"
+          <ConfirmButton
+            isSuccess
             onMouseDown={e => {
               e.preventDefault();
               handleSubmit();
             }}
-          >
-            ✓
-          </button>
+            onClick={handleSubmit}
+          />
         ) : isDeleting ? (
           <>
-            <button
-              className="actionBtn confirm-delete-btn"
-              onClick={e => {
-                e.stopPropagation();
+            <ConfirmButton
+              onClick={() => {
                 onDelete?.(task);
                 setIsDeleting(false);
               }}
               title={t('modules.todo.shared.item.confirmDelete')}
-              style={{ color: 'var(--interactive-error)', fontWeight: 'bold' }}
-            >
-              ✓
-            </button>
-            <button
-              className="actionBtn cancel-delete-btn"
-              onClick={e => {
-                e.stopPropagation();
-                setIsDeleting(false);
-              }}
+            />
+            <CancelButton
+              onClick={() => setIsDeleting(false)}
               title={t('modules.todo.shared.item.cancel')}
-            >
-              ✗
-            </button>
+            />
           </>
         ) : (
           <>
-            <button
-              className={`actionBtn ${task.isPinned ? 'pinned' : ''}`}
-              onClick={e => {
-                e.stopPropagation();
-                onPin(task);
-              }}
+            <PinButton
+              isPinned={task.isPinned || false}
+              onToggle={() => onPin(task)}
               title={t('modules.todo.shared.item.pin')}
-            >
-              {task.isPinned ? '📌' : '📍'}
-            </button>
+            />
 
             {/* Daily tasks do not support abandoning */}
             {!task.isDaily && (
-              <button
-                className="actionBtn"
-                onClick={e => {
-                  e.stopPropagation();
-                  onAbandon(task);
-                }}
+              <AbandonButton
+                onClick={() => onAbandon(task)}
                 title={t('modules.todo.shared.item.abandon')}
-              >
-                ❌
-              </button>
+              />
             )}
 
             {/* Delete button (Trash) */}
             {onDelete && (
-              <button
-                className="actionBtn delete-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsDeleting(true);
-                }}
+              <DeleteButton
+                onClick={() => setIsDeleting(true)}
                 title={t('modules.todo.shared.item.delete')}
-              >
-                🗑️
-              </button>
+              />
             )}
           </>
         )}

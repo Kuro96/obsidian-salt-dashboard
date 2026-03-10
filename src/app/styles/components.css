@@ -163,3 +163,55 @@
   color: var(--text-muted);
   font-size: 13px;
 }
+
+/* Shared Item Action Buttons */
+.shared-item-action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  opacity: 0.7;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.shared-item-action-btn:hover {
+  opacity: 1;
+  color: var(--text-normal);
+  transform: scale(1.1);
+}
+
+.shared-item-action-btn.pinned {
+  color: var(--interactive-accent);
+  opacity: 1;
+}
+
+.shared-item-action-btn.confirm-delete {
+  color: var(--interactive-error);
+  font-weight: bold;
+  opacity: 1;
+}
+
+.shared-item-action-btn.confirm-delete:hover {
+  background: var(--background-modifier-error-hover, rgba(255, 0, 0, 0.1));
+  transform: scale(1.1);
+}
+
+.shared-item-action-btn.confirm-success {
+  color: var(--interactive-success);
+  font-weight: bold;
+  opacity: 1;
+}
+
+.shared-item-action-btn.confirm-success:hover {
+  background: var(--background-modifier-success-hover, rgba(0, 255, 0, 0.1));
+  transform: scale(1.1);
+}
+
