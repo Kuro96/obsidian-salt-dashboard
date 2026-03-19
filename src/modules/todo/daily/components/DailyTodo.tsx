@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { CronInput, getCronLabel } from './CronInput';
 import { AutoResizeTextarea } from '../../../../shared/components/AutoResizeTextarea';
 import { MultiSelect } from '../../../../shared/components/MultiSelect';
+import { useTaskSubmission } from '../../shared/hooks/useTaskSubmission';
 
 import { SortControls } from '../../../../shared/components/SortControls';
 
@@ -71,16 +72,20 @@ export const DailyTodo: React.FC = () => {
       .sort((a, b) => (a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1));
   }, [tasks, statusFilters]);
 
-  const handleAddTask = async () => {
-    if (taskText.trim()) {
-      // Construct full text with cron
+  const resetAddForm = React.useCallback(() => {
+    setTaskText('');
+    setCronExpr('* * *');
+    setIsAdding(false);
+  }, []);
+
+  const { isSubmitting, submit, cancel } = useTaskSubmission({
+    canSubmit: () => Boolean(taskText.trim()),
+    onSubmit: async () => {
       const fullText = `${taskText.trim()} \`${cronExpr}\``;
       await addTask(fullText);
-      setTaskText('');
-      setCronExpr('* * *');
-      setIsAdding(false);
-    }
-  };
+    },
+    onReset: resetAddForm,
+  });
 
   const startEditCron = (task: any) => {
     setEditingCronId(task.id);
@@ -218,9 +223,11 @@ export const DailyTodo: React.FC = () => {
               value={taskText}
               autoFocus
               onChange={e => setTaskText(e.target.value)}
-              onEnter={handleAddTask}
+              onEnter={submit}
               onKeyDown={e => {
-                if (e.key === 'Escape') setIsAdding(false);
+                if (e.key === 'Escape') {
+                  cancel();
+                }
               }}
               className="add-task-input task-text-input"
             />
@@ -228,17 +235,18 @@ export const DailyTodo: React.FC = () => {
             <CronInput
               value={cronExpr}
               onChange={setCronExpr}
-              onConfirm={handleAddTask}
-              onCancel={() => setIsAdding(false)}
+              onConfirm={submit}
+              onCancel={cancel}
             />
 
             <button
               className="confirm-add-btn"
               onMouseDown={e => {
                 e.preventDefault();
-                handleAddTask();
+                void submit();
               }}
               title={t('modules.todo.daily.addTask')}
+              disabled={isSubmitting}
             >
               ✓
             </button>

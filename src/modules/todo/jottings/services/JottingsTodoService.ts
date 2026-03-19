@@ -4,11 +4,32 @@ import { JottingsTodoConfig, Task } from '../../../../app/types';
 import { moment } from 'obsidian';
 
 export class JottingsTodoService extends TodoBaseService {
+  private static pendingAddKeys = new Set<string>();
+  private static recentAddTimestamps = new Map<string, number>();
   protected config: JottingsTodoConfig;
 
   constructor(app: App, config: JottingsTodoConfig) {
     super(app, config);
     this.config = config;
+  }
+
+  private extractJottingsLinkPaths(text: string): string[] {
+    const jottingsPrefix = `${this.config.jottingsFolder || 'jottings'}/`;
+    const linkRegex = new RegExp(`\\[\\[(${jottingsPrefix}.*?)(?:\\|.*?)?\\]\\]`, 'g');
+    const paths = new Set<string>();
+
+    let match;
+    while ((match = linkRegex.exec(text)) !== null) {
+      paths.add(match[1]);
+    }
+
+    return Array.from(paths);
+  }
+
+  private getLinkedJottingsFiles(text: string): TFile[] {
+    return this.extractJottingsLinkPaths(text)
+      .map(linkPath => this.app.metadataCache.getFirstLinkpathDest(linkPath, ''))
+      .filter((file): file is TFile => file instanceof TFile);
   }
 
   protected async fetchRawTasks(date?: string): Promise<Task[]> {
@@ -62,9 +83,8 @@ export class JottingsTodoService extends TodoBaseService {
         if (match) {
           const statusChar = match[1];
           const text = match[2];
-
-          const linkRegex = new RegExp(`\\[\\[${jottingsPrefix}.*?\\]\\]`);
-          if (!linkRegex.test(text)) return;
+          const jottingLinks = this.extractJottingsLinkPaths(text);
+          if (jottingLinks.length === 0) return;
 
           const isCompleted = statusChar === 'x';
           const isAbandoned = statusChar === '-';
@@ -97,6 +117,7 @@ export class JottingsTodoService extends TodoBaseService {
             completedDate,
             abandonedDate,
             tags: [],
+            jottingLinks,
           });
         }
       });
@@ -116,19 +137,11 @@ export class JottingsTodoService extends TodoBaseService {
     const folderPath = this.config.todoSourceFolder || 'TODO';
     const path = `${folderPath}/${fileName}`;
 
-    // Check for jottings links and create notes if needed
-    const jottingsPrefix = `${this.config.jottingsFolder || 'jottings'}/`;
-    // Modified Regex to capture link path more robustly
-    const linkRegex = new RegExp(`\\[\\[(${jottingsPrefix}.*?)(?:\\|.*?)?\\]\\]`, 'g');
-
     let finalText = text;
-    let match;
-    let hasLink = false;
+    const linkPaths = this.extractJottingsLinkPaths(text);
+    const hasLink = linkPaths.length > 0;
 
-    while ((match = linkRegex.exec(text)) !== null) {
-      hasLink = true;
-      const linkPath = match[1];
-
+    for (const linkPath of linkPaths) {
       const exists = this.app.metadataCache.getFirstLinkpathDest(linkPath, '');
 
       if (!exists && this.config.templatePath) {
@@ -160,16 +173,41 @@ export class JottingsTodoService extends TodoBaseService {
       }
     }
 
-    let file = this.app.vault.getAbstractFileByPath(path);
-    if (!file) {
-      if (!this.app.vault.getAbstractFileByPath(folderPath)) {
-        await this.app.vault.createFolder(folderPath);
-      }
-      file = await this.app.vault.create(path, '');
+    const addKey = `${path}::${finalText}`;
+    const now = Date.now();
+    const lastAddedAt = JottingsTodoService.recentAddTimestamps.get(addKey);
+
+    if (lastAddedAt && now - lastAddedAt < 1500) {
+      return;
     }
 
-    if (file instanceof TFile) {
-      await this.app.vault.append(file, `\n- [ ] ${finalText}`);
+    if (JottingsTodoService.pendingAddKeys.has(addKey)) {
+      return;
+    }
+
+    JottingsTodoService.pendingAddKeys.add(addKey);
+
+    try {
+      let file = this.app.vault.getAbstractFileByPath(path);
+      if (!file) {
+        if (!this.app.vault.getAbstractFileByPath(folderPath)) {
+          await this.app.vault.createFolder(folderPath);
+        }
+        file = await this.app.vault.create(path, '');
+      }
+
+      if (file instanceof TFile) {
+        const lineToAppend = `- [ ] ${finalText}`;
+        const existingContent = await this.app.vault.read(file);
+        const existingLines = existingContent.split('\n').map(line => line.trim());
+
+        if (!existingLines.includes(lineToAppend)) {
+          await this.app.vault.append(file, `\n${lineToAppend}`);
+          JottingsTodoService.recentAddTimestamps.set(addKey, now);
+        }
+      }
+    } finally {
+      JottingsTodoService.pendingAddKeys.delete(addKey);
     }
   }
 
@@ -283,41 +321,27 @@ export class JottingsTodoService extends TodoBaseService {
   }
 
   async deleteTask(task: Task): Promise<void> {
+    const linkedFiles = this.getLinkedJottingsFiles(task.text);
+
     await this.modifyTaskFile(task, (lines, idx) => {
       lines.splice(idx, 1);
     });
 
-    // If we delete a task, we should also revert any tags if it was completed/abandoned?
-    // Or just treat it as removal.
-    // If task was completed, we probably want to "uncomplete" it in terms of tags.
-    // But text is gone, so regex won't match anymore.
-    // We pass `task.text` which still holds the old text.
-    if (task.completed) {
-      await this.updateLinkedJottings(task.text, 'uncomplete');
-    } else if (task.isAbandoned) {
-      await this.updateLinkedJottings(task.text, 'unabandon');
-    } else {
-      // If it was just pending/pinned, we might still want to ensure 'jottings' tag is present/absent?
-      // Actually "uncomplete" adds back base tag and removes done tag.
-      // If we delete the task, should we remove the base tag too?
-      // Usually we don't delete the NOTE, just the reference in TODO.
-      // So the note status shouldn't change?
-      // But if the TODO is gone, maybe it's not "in progress" anymore?
-      // Let's stick to safe side: revert status tags if it was done/abandoned.
+    for (const file of linkedFiles) {
+      try {
+        await this.app.fileManager.trashFile(file);
+      } catch (e) {
+        console.error('Failed to delete linked jotting file', e);
+        new Notice(`[Dashboard] Failed to delete linked jotting: ${file.path}`);
+      }
     }
   }
 
   private async updateLinkedJottings(text: string, action: string) {
-    const jottingsPrefix = `${this.config.jottingsFolder || 'jottings'}/`;
-    const linkRegex = new RegExp(`\\[\\[(${jottingsPrefix}.*?)(?:\\|.*?)?\\]\\]`, 'g');
+    const linkedFiles = this.getLinkedJottingsFiles(text);
 
-    let match;
-    while ((match = linkRegex.exec(text)) !== null) {
-      const linkPath = match[1];
-      const file = this.app.metadataCache.getFirstLinkpathDest(linkPath, '');
-      if (file instanceof TFile) {
-        await this.updateFileTags(file, action);
-      }
+    for (const file of linkedFiles) {
+      await this.updateFileTags(file, action);
     }
   }
 

@@ -5,6 +5,7 @@ import { TodoItem } from '../../shared/components/TodoItem';
 import { useState } from 'react';
 import { AutoResizeTextarea } from '../../../../shared/components/AutoResizeTextarea';
 import { MultiSelect } from '../../../../shared/components/MultiSelect';
+import { useTaskSubmission } from '../../shared/hooks/useTaskSubmission';
 
 import { SortControls } from '../../../../shared/components/SortControls';
 
@@ -30,6 +31,19 @@ export const RegularTodo: React.FC = () => {
   const [newTask, setNewTask] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
+  const resetAddForm = React.useCallback(() => {
+    setNewTask('');
+    setIsAdding(false);
+  }, []);
+
+  const { isSubmitting, submit, cancel } = useTaskSubmission({
+    canSubmit: () => Boolean(newTask.trim()),
+    onSubmit: async () => {
+      await addTask(newTask.trim());
+    },
+    onReset: resetAddForm,
+  });
+
   const visibleTasks = React.useMemo(() => {
     return tasks.filter(t => {
       const isCompleted = t.completed;
@@ -46,14 +60,6 @@ export const RegularTodo: React.FC = () => {
       return show;
     });
   }, [tasks, statusFilters]);
-
-  const handleAddTask = async () => {
-    if (newTask.trim()) {
-      await addTask(newTask.trim());
-      setNewTask('');
-      setIsAdding(false);
-    }
-  };
 
   if (loading) {
     return <div className="loading-state">{t('modules.todo.daily.loading')}</div>;
@@ -118,11 +124,10 @@ export const RegularTodo: React.FC = () => {
               value={newTask}
               autoFocus
               onChange={e => setNewTask(e.target.value)}
-              onEnter={handleAddTask}
+              onEnter={submit}
               onKeyDown={e => {
                 if (e.key === 'Escape') {
-                  setIsAdding(false);
-                  setNewTask('');
+                  cancel();
                 }
               }}
               className="add-task-input"
@@ -132,9 +137,10 @@ export const RegularTodo: React.FC = () => {
               className="confirm-add-btn"
               onMouseDown={e => {
                 e.preventDefault();
-                handleAddTask();
+                void submit();
               }}
               title={t('modules.todo.daily.addTask')}
+              disabled={isSubmitting}
             >
               ✓
             </button>

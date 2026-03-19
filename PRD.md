@@ -8,7 +8,7 @@ tags:
   - plugin
   - prd
 create_date: 2026-02-09T18:27
-modified_date: 2026-02-24T00:00
+modified_date: 2026-03-19T00:00
 cssclasses:
   - wide-view
 status: draft
@@ -59,6 +59,8 @@ version: 1.0.8
 
 - 全面的单元测试
 - 类型定义清理与优化
+- TODO 模块新增任务流程统一为单一提交入口并增加防重复提交保护，避免同一交互写入多条相同任务
+- TODO 模块新增提交流程已抽离为共享状态 hook，在统一防重入的同时保留各模块独立业务规则
 
 ---
 
@@ -252,10 +254,18 @@ version: 1.0.8
   - **ID**: `jottings-todo`
   - **功能**: 管理与 jottings 笔记链接的任务，完成时自动更新笔记标签。
   - **配置项**: `jottingsFolder`, `doneTag`, `abandonedTag`, `templatePath`
-  - **特性**:
-    - 自动扫描包含 `[[jottings/xxx]]` 链接的任务
-    - 完成任务时自动更新笔记标签（`jottings` → `jottings/done`）
-    - 支持 Templater 模板创建新 jottings 笔记
+- **特性**:
+  - 自动扫描包含 `[[jottings/xxx]]` 链接的任务
+  - 完成任务时自动更新笔记标签（`jottings` → `jottings/done`）
+  - 支持 Templater 模板创建新 jottings 笔记
+  - 新增任务时同时使用交互层提交锁和 service 层短窗口幂等保护，避免重复写入
+  - 删除 Jottings TODO 任务时，同时将关联的 Jottings 笔记移入回收站
+
+- **3.4 待办模块交互一致性**
+  - Daily / Regular / Jottings 三类 TODO 模块的新增任务统一使用单一提交流程
+  - 回车、确认按钮与附加输入控件确认事件共享同一提交函数，并带有提交中防重入保护
+  - 防重入不仅依赖 React state，也使用同步锁处理 state 尚未刷新前的重复触发
+  - 共享 hook 只负责提交状态与重置时机，具体提交内容仍由各模块自行定义
 
 ##### 4. 近期文档模块 (RecentFilesModule)
 

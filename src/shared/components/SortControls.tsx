@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HeaderActionButton } from './HeaderActionButton';
+import { SortOption } from '../../app/types';
 
-export type SortOption = 'default' | 'name' | 'mtime';
 export type SortOrder = 'asc' | 'desc';
 
 interface SortControlsProps {
@@ -25,7 +25,7 @@ export const SortControls: React.FC<SortControlsProps> = ({
   const effectiveOptions = options || [
     { label: t('modules.todo.shared.sort.default'), value: 'default' },
     { label: t('modules.todo.shared.sort.name'), value: 'name' },
-    { label: t('shared.sort.time'), value: 'mtime' },
+    { label: t('modules.todo.shared.sort.modified'), value: 'modified' },
   ];
 
   return (

@@ -4,6 +4,7 @@ import { useJottingsTodo } from '../hooks/useJottingsTodo';
 import { TodoItem } from '../../shared/components/TodoItem';
 import { useState } from 'react';
 import { MultiSelect } from '../../../../shared/components/MultiSelect';
+import { useTaskSubmission } from '../../shared/hooks/useTaskSubmission';
 
 import { SortControls } from '../../../../shared/components/SortControls';
 
@@ -28,6 +29,19 @@ export const JottingsTodo: React.FC = () => {
   const [newTask, setNewTask] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
+  const resetAddForm = React.useCallback(() => {
+    setNewTask('');
+    setIsAdding(false);
+  }, []);
+
+  const { isSubmitting, submit, cancel } = useTaskSubmission({
+    canSubmit: () => Boolean(newTask.trim()),
+    onSubmit: async () => {
+      await addTask(newTask.trim());
+    },
+    onReset: resetAddForm,
+  });
+
   const visibleTasks = React.useMemo(() => {
     return tasks.filter(t => {
       const isCompleted = t.completed;
@@ -46,19 +60,11 @@ export const JottingsTodo: React.FC = () => {
   }, [tasks, statusFilters]);
 
   const handleKeyDown = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && newTask.trim()) {
-      await addTask(newTask.trim());
-      setNewTask('');
-      setIsAdding(false);
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      await submit();
     } else if (e.key === 'Escape') {
-      setIsAdding(false);
-      setNewTask('');
-    }
-  };
-
-  const handleBlur = () => {
-    if (!newTask.trim()) {
-      setIsAdding(false);
+      cancel();
     }
   };
 
@@ -133,13 +139,10 @@ export const JottingsTodo: React.FC = () => {
               className="confirm-add-btn"
               onMouseDown={e => {
                 e.preventDefault();
-                if (newTask.trim()) {
-                  addTask(newTask.trim());
-                  setNewTask('');
-                  setIsAdding(false);
-                }
+                void submit();
               }}
               title={t('modules.todo.daily.addTask')}
+              disabled={isSubmitting}
             >
               ✓
             </button>
