@@ -10,6 +10,7 @@
   padding: 4px 6px;
   border-bottom: 1px solid var(--background-modifier-border);
   transition: background-color 0.2s;
+  position: relative;
 }
 
 .todoItem.pinned {
@@ -33,6 +34,7 @@
 
 .content {
   flex: 1;
+  min-width: 0;
   word-break: break-word;
   color: var(--text-normal);
   font-size: 14px;
@@ -60,9 +62,12 @@
 
 .actions {
   display: flex;
+  align-items: center;
+  gap: 2px;
   opacity: 0;
   transition: opacity 0.2s;
   margin-left: 8px;
+  flex-shrink: 0;
 }
 
 .todoItem:hover .actions {
@@ -71,6 +76,38 @@
 
 @media (hover: none) {
   .actions {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .todoItem .actions {
+    max-width: 0;
+    overflow: hidden;
+    margin-left: 0;
+    opacity: 0;
+    pointer-events: none;
+    flex-wrap: nowrap;
+  }
+
+  .todoItem:hover .actions,
+  .todoItem:focus-within .actions {
+    opacity: 1;
+    pointer-events: auto;
+    max-width: 96px;
+    margin-left: 8px;
+  }
+
+  .todoItem .actions .shared-item-action-btn {
+    opacity: 0.7;
+  }
+
+  .todoItem .actions .shared-item-action-btn.abandon-btn {
+    opacity: 0.42;
+  }
+
+  .todoItem:hover .actions .shared-item-action-btn:hover,
+  .todoItem:focus-within .actions .shared-item-action-btn:hover {
     opacity: 1;
   }
 }
