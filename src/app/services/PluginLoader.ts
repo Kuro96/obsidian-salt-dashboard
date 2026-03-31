@@ -2,9 +2,31 @@ import { App, TFile, Notice } from 'obsidian';
 import * as React from 'react';
 import * as Obsidian from 'obsidian';
 import { transform } from 'sucrase';
+import { DashboardModule } from '../architecture/DashboardModule';
 import { registry } from '../registry/ModuleRegistry';
 import { LayoutManager } from './LayoutManager';
 import { HomepageSettings } from '../types';
+
+type CommonJsModule = {
+  exports: unknown;
+};
+
+function isDashboardModule(value: unknown): value is DashboardModule {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<DashboardModule>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.title === 'string' &&
+    typeof candidate.icon === 'string' &&
+    typeof candidate.component === 'function' &&
+    typeof candidate.renderSettings === 'function' &&
+    typeof candidate.defaultSettings === 'object' &&
+    candidate.defaultSettings !== null
+  );
+}
 
 export class PluginLoader {
   private app: App;
@@ -68,7 +90,7 @@ export class PluginLoader {
       }
 
       // Prepare CommonJS-like environment
-      const module = { exports: {} as any };
+      const module: CommonJsModule = { exports: {} };
       const exports = module.exports;
 
       // Shim require
@@ -85,9 +107,13 @@ export class PluginLoader {
 
       // Expect module.exports to be the DashboardModule object
       // or module.exports.default
-      const pluginModule = module.exports.default || module.exports;
+      const pluginExports = module.exports as { default?: unknown } | unknown;
+      const pluginModule =
+        pluginExports && typeof pluginExports === 'object' && 'default' in pluginExports
+          ? pluginExports.default
+          : pluginExports;
 
-      if (pluginModule && pluginModule.id && pluginModule.component) {
+      if (isDashboardModule(pluginModule)) {
         registry.register(pluginModule);
         this.loadedPlugins.add(pluginModule.id);
         new Notice(`Loaded plugin: ${pluginModule.title}`);

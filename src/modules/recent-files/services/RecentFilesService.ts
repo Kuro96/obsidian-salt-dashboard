@@ -5,12 +5,43 @@ import { SourceParser } from '../../../shared/utils/SourceParser';
 import { formatSize } from '../../../shared/utils/formatSize';
 import { getFileMtime, getFileCtime } from '../../../shared/utils/fileTime';
 
+type FrontmatterValue = string | string[] | undefined;
+
+type FrontmatterData = {
+  tags?: FrontmatterValue;
+};
+
+type TemplaterPlugin = {
+  templater: {
+    create_new_note_from_template: (
+      templateFile: TFile,
+      folder: unknown,
+      title: string
+    ) => Promise<unknown>;
+  };
+};
+
+function normalizeFrontmatterTags(value: FrontmatterValue): string[] {
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(Boolean);
+  }
+
+  if (Array.isArray(value)) {
+    return value.filter((tag): tag is string => typeof tag === 'string');
+  }
+
+  return [];
+}
+
 export interface FileInfo {
   file: TFile;
   name: string;
   path: string;
   extension: string;
-  stat: any; // Keep for backwards compatibility if needed, but prefer mtime/ctime
+  stat: TFile['stat'];
   mtime: number;
   ctime: number;
   tags: string[];
@@ -27,6 +58,25 @@ export class RecentFilesService {
     this.app = app;
     this.config = config;
     this.parser = new SourceParser(app);
+  }
+
+  private getTemplaterPlugin(): TemplaterPlugin | null {
+    const plugins = (this.app as App & { plugins?: { plugins?: Record<string, unknown> } }).plugins;
+    const templater = plugins?.plugins?.['templater-obsidian'];
+
+    if (
+      templater &&
+      typeof templater === 'object' &&
+      'templater' in templater &&
+      templater.templater &&
+      typeof templater.templater === 'object' &&
+      'create_new_note_from_template' in templater.templater &&
+      typeof templater.templater.create_new_note_from_template === 'function'
+    ) {
+      return templater as TemplaterPlugin;
+    }
+
+    return null;
   }
 
   private getTags(file: TFile): string[] {
@@ -139,7 +189,7 @@ export class RecentFilesService {
         new Notice(`[Dashboard] Template file not found: ${templatePath}`);
         return false;
       }
-      const templater = (this.app as any).plugins.plugins['templater-obsidian'];
+      const templater = this.getTemplaterPlugin();
       if (templater) {
         try {
           await templater.templater.create_new_note_from_template(
@@ -199,35 +249,26 @@ export class RecentFilesService {
     const file = this.app.vault.getAbstractFileByPath(path);
     if (file instanceof TFile) {
       try {
-        await (this.app.fileManager as any).processFrontMatter(file, (fm: any) => {
-          let tags = fm.tags;
-          if (!tags) {
+        await this.app.fileManager.processFrontMatter(file, (fm: FrontmatterData) => {
+          const tags = normalizeFrontmatterTags(fm.tags);
+
+          if (tags.length === 0) {
             fm.tags = ['pinned'];
             return;
           }
 
-          if (typeof tags === 'string') {
-            tags = tags.split(',').map((t: string) => t.trim());
-          }
+          const hasPinned = tags.some(tag => {
+            const normalizedTag = tag.toLowerCase();
+            return normalizedTag === 'pinned' || normalizedTag === '#pinned';
+          });
 
-          if (Array.isArray(tags)) {
-            const hasPinned = tags.some((t: any) => {
-              const s = typeof t === 'string' ? t.toLowerCase() : '';
-              return s === 'pinned' || s === '#pinned';
+          if (hasPinned) {
+            fm.tags = tags.filter(tag => {
+              const normalizedTag = tag.toLowerCase();
+              return normalizedTag !== 'pinned' && normalizedTag !== '#pinned';
             });
-
-            if (hasPinned) {
-              const newTags = tags.filter((t: any) => {
-                const s = typeof t === 'string' ? t.toLowerCase() : '';
-                return s !== 'pinned' && s !== '#pinned';
-              });
-              fm.tags = newTags;
-            } else {
-              tags.push('pinned');
-              fm.tags = tags;
-            }
           } else {
-            fm.tags = ['pinned'];
+            fm.tags = [...tags, 'pinned'];
           }
         });
         return true;

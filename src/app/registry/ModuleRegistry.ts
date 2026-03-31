@@ -43,8 +43,8 @@ class ModuleRegistry {
    * Modules without a settingsKey must provide a pre-wrapped object themselves.
    * @returns A merged object of all default settings.
    */
-  getAllDefaultSettings(): Record<string, any> {
-    const defaults: Record<string, any> = {};
+  getAllDefaultSettings(): Record<string, unknown> {
+    const defaults: Record<string, unknown> = {};
     this.modules.forEach(module => {
       if (module.settingsKey) {
         defaults[module.settingsKey] = module.defaultSettings;

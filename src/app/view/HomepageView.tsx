@@ -37,7 +37,7 @@ export class HomepageView extends ItemView {
         <I18nextProvider i18n={i18n}>
           <ObsidianProvider app={this.app}>
             <SettingsProvider settings={this.plugin.settings} plugin={this.plugin}>
-              <App app={this.app} settings={this.plugin.settings} />
+              <App />
             </SettingsProvider>
           </ObsidianProvider>
         </I18nextProvider>

@@ -169,5 +169,5 @@ export interface HomepageSettings {
   tmpNote: TmpNoteConfig;
 
   // Dynamic Module Settings
-  [key: string]: any;
+  [key: string]: unknown;
 }

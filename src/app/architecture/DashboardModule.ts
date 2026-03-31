@@ -1,4 +1,4 @@
-import { App, Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 import React from 'react';
 import { HomepageSettings } from '../types';
 
@@ -33,7 +33,7 @@ export interface DashboardModule {
    * Default settings for this module (the config slice, not the full settings object).
    * Built-in modules should pair this with settingsKey so the registry can wrap it correctly.
    */
-  defaultSettings: Record<string, any>;
+  defaultSettings: Record<string, unknown>;
 
   /**
    * Optional default layout configuration.
@@ -48,7 +48,7 @@ export interface DashboardModule {
   /**
    * The React component to render for this module.
    */
-  component: React.ComponentType<any>;
+  component: React.ComponentType;
 
   /**
    * Function to render settings UI for this module.

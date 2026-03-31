@@ -127,7 +127,7 @@ export default class HomepagePlugin extends Plugin {
         <I18nextProvider i18n={i18n}>
           <ObsidianProvider app={this.app}>
             <SettingsProvider settings={this.settings} plugin={this}>
-              <App app={this.app} settings={this.settings} />
+              <App />
             </SettingsProvider>
           </ObsidianProvider>
         </I18nextProvider>

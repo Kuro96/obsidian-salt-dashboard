@@ -1,14 +1,7 @@
 import * as React from 'react';
-import { HomepageSettings } from './types';
-import { App as ObsidianApp } from 'obsidian';
 import { GridLayout } from './layout/GridLayout';
 
-interface AppProps {
-  app: ObsidianApp;
-  settings: HomepageSettings;
-}
-
-export const App: React.FC<AppProps> = ({ app, settings }) => {
+export const App: React.FC = () => {
   return (
     <div className="dashboard-container">
       <GridLayout />
