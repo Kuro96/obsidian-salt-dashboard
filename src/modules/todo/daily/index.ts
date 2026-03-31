@@ -46,5 +46,25 @@ export const DailyTodoModule: DashboardModule = {
           await (plugin as any).saveSettings();
         })
       );
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.dailyTodo.showPinButton.name'))
+      .setDesc(i18n.t('modules.settings.dailyTodo.showPinButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.dailyTodo.showPinButton ?? true).onChange(async value => {
+          settings.dailyTodo.showPinButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.dailyTodo.showDeleteButton.name'))
+      .setDesc(i18n.t('modules.settings.dailyTodo.showDeleteButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.dailyTodo.showDeleteButton ?? true).onChange(async value => {
+          settings.dailyTodo.showDeleteButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
   },
 };

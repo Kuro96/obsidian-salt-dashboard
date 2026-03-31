@@ -6,11 +6,13 @@ import { useState } from 'react';
 import { AutoResizeTextarea } from '../../../../shared/components/AutoResizeTextarea';
 import { MultiSelect } from '../../../../shared/components/MultiSelect';
 import { useTaskSubmission } from '../../shared/hooks/useTaskSubmission';
+import { useSettings } from '../../../../app/context/SettingsContext';
 
 import { SortControls } from '../../../../shared/components/SortControls';
 
 export const RegularTodo: React.FC = () => {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const {
     tasks,
     loading,
@@ -105,6 +107,9 @@ export const RegularTodo: React.FC = () => {
             onAbandon={abandonTask}
             onUpdate={updateTask}
             onDelete={deleteTask}
+            showPinButton={settings.regularTodo.showPinButton}
+            showAbandonButton={settings.regularTodo.showAbandonButton}
+            showDeleteButton={settings.regularTodo.showDeleteButton}
           />
         ))}
         {visibleTasks.length === 0 && (

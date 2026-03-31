@@ -9,11 +9,13 @@ import { CronInput, getCronLabel } from './CronInput';
 import { AutoResizeTextarea } from '../../../../shared/components/AutoResizeTextarea';
 import { MultiSelect } from '../../../../shared/components/MultiSelect';
 import { useTaskSubmission } from '../../shared/hooks/useTaskSubmission';
+import { useSettings } from '../../../../app/context/SettingsContext';
 
 import { SortControls } from '../../../../shared/components/SortControls';
 
 export const DailyTodo: React.FC = () => {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const {
     tasks,
     loading,
@@ -140,6 +142,9 @@ export const DailyTodo: React.FC = () => {
               onAbandon={abandonTask}
               onUpdate={updateTask}
               onDelete={deleteTask}
+              showPinButton={settings.dailyTodo.showPinButton}
+              showAbandonButton={settings.dailyTodo.showAbandonButton}
+              showDeleteButton={settings.dailyTodo.showDeleteButton}
             />
 
             {/* Cron Badge or Editor */}

@@ -236,12 +236,17 @@ export default {
         fileName: { name: '每日文件名', desc: '例如 daily.md' },
         statsFile: { name: '统计数据 JSON 路径', desc: '用于保存任务完成统计数据的文件路径。' },
         crontab: { name: '启用 Crontab', desc: '在每日任务中解析 crontab 语法。' },
+        showPinButton: { name: '显示置顶按钮', desc: '在每条任务右侧显示置顶操作按钮。' },
+        showDeleteButton: { name: '显示删除按钮', desc: '在每条任务右侧显示删除操作按钮。' },
       },
       regularTodo: {
         title: '常规待办',
         heading: '常规待办设置',
         dateFormat: { name: '日期格式', desc: '每日文件的格式 (例如 YYMMDD)。' },
         autoCreate: { name: '自动创建文件', desc: '检查任务时如果今天的文件不存在则创建。' },
+        showPinButton: { name: '显示置顶按钮', desc: '在每条任务右侧显示置顶操作按钮。' },
+        showAbandonButton: { name: '显示放弃按钮', desc: '在每条任务右侧显示放弃操作按钮。' },
+        showDeleteButton: { name: '显示删除按钮', desc: '在每条任务右侧显示删除操作按钮。' },
       },
       jottingsTodo: {
         title: '随手记待办',
@@ -255,6 +260,9 @@ export default {
           name: '随手记模板路径',
           desc: '新随手记的 Templater 模板路径 (例如 Templates/Jotting.md)。留空以禁用。',
         },
+        showPinButton: { name: '显示置顶按钮', desc: '在每条任务右侧显示置顶操作按钮。' },
+        showAbandonButton: { name: '显示放弃按钮', desc: '在每条任务右侧显示放弃操作按钮。' },
+        showDeleteButton: { name: '显示删除按钮', desc: '在每条任务右侧显示删除操作按钮。' },
       },
       tmpNote: {
         title: '临时笔记',

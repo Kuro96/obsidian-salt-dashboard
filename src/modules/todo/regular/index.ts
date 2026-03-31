@@ -33,5 +33,35 @@ export const RegularTodoModule: DashboardModule = {
           await (plugin as any).saveSettings();
         })
       );
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.regularTodo.showPinButton.name'))
+      .setDesc(i18n.t('modules.settings.regularTodo.showPinButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.regularTodo.showPinButton ?? true).onChange(async value => {
+          settings.regularTodo.showPinButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.regularTodo.showAbandonButton.name'))
+      .setDesc(i18n.t('modules.settings.regularTodo.showAbandonButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.regularTodo.showAbandonButton ?? true).onChange(async value => {
+          settings.regularTodo.showAbandonButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.regularTodo.showDeleteButton.name'))
+      .setDesc(i18n.t('modules.settings.regularTodo.showDeleteButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.regularTodo.showDeleteButton ?? true).onChange(async value => {
+          settings.regularTodo.showDeleteButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
   },
 };

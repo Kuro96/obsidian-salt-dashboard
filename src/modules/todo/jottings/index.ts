@@ -47,5 +47,35 @@ export const JottingsTodoModule: DashboardModule = {
         });
         new FileSuggest(plugin.app, text.inputEl);
       });
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.jottingsTodo.showPinButton.name'))
+      .setDesc(i18n.t('modules.settings.jottingsTodo.showPinButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.jottingsTodo.showPinButton ?? true).onChange(async value => {
+          settings.jottingsTodo.showPinButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.jottingsTodo.showAbandonButton.name'))
+      .setDesc(i18n.t('modules.settings.jottingsTodo.showAbandonButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.jottingsTodo.showAbandonButton ?? true).onChange(async value => {
+          settings.jottingsTodo.showAbandonButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName(i18n.t('modules.settings.jottingsTodo.showDeleteButton.name'))
+      .setDesc(i18n.t('modules.settings.jottingsTodo.showDeleteButton.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.jottingsTodo.showDeleteButton ?? true).onChange(async value => {
+          settings.jottingsTodo.showDeleteButton = value;
+          await (plugin as any).saveSettings();
+        })
+      );
   },
 };

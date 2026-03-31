@@ -72,6 +72,9 @@ export interface TodoModuleConfig extends ModuleConfig {
   statusFilters?: string[]; // 状态过滤 (NEW)
   sortBy?: SortOption; // 排序方式 (NEW)
   sortOrder?: SortOrder; // 排序方向 (NEW)
+  showPinButton?: boolean; // 是否显示置顶按钮
+  showAbandonButton?: boolean; // 是否显示放弃按钮
+  showDeleteButton?: boolean; // 是否显示删除按钮
 }
 
 // Daily TODO 配置

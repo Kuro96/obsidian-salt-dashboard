@@ -33,7 +33,7 @@ export interface DashboardModule {
    * Default settings for this module (the config slice, not the full settings object).
    * Built-in modules should pair this with settingsKey so the registry can wrap it correctly.
    */
-  defaultSettings: Record<string, unknown>;
+  defaultSettings: object;
 
   /**
    * Optional default layout configuration.

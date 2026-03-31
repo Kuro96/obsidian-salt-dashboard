@@ -5,11 +5,13 @@ import { TodoItem } from '../../shared/components/TodoItem';
 import { useState } from 'react';
 import { MultiSelect } from '../../../../shared/components/MultiSelect';
 import { useTaskSubmission } from '../../shared/hooks/useTaskSubmission';
+import { useSettings } from '../../../../app/context/SettingsContext';
 
 import { SortControls } from '../../../../shared/components/SortControls';
 
 export const JottingsTodo: React.FC = () => {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const {
     tasks,
     loading,
@@ -112,6 +114,9 @@ export const JottingsTodo: React.FC = () => {
             onAbandon={abandonTask}
             onUpdate={updateTask}
             onDelete={deleteTask}
+            showPinButton={settings.jottingsTodo.showPinButton}
+            showAbandonButton={settings.jottingsTodo.showAbandonButton}
+            showDeleteButton={settings.jottingsTodo.showDeleteButton}
           />
         ))}
         {visibleTasks.length === 0 && (

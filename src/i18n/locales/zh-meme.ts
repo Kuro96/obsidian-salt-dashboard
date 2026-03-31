@@ -236,6 +236,8 @@ export default {
         fileName: { name: '日常的锉刀名字', desc: '例如 每日的.md' },
         statsFile: { name: '统计 JSON 锉刀小径', desc: '小径去储存任务完成统计。' },
         crontab: { name: '能够克龙标签', desc: '解析克龙标签语法在日常的任务里。' },
+        showPinButton: { name: '展示大头针按钮', desc: '展示大头针操作按钮在每一条任务旁边。' },
+        showDeleteButton: { name: '展示删除按钮', desc: '展示删除操作按钮在每一条任务旁边。' },
       },
       regularTodo: {
         title: '规律的去做',
@@ -245,6 +247,9 @@ export default {
           name: '汽车创造锉刀',
           desc: '创造今天的锉刀如果丢失当检查任务时。',
         },
+        showPinButton: { name: '展示大头针按钮', desc: '展示大头针操作按钮在每一条任务旁边。' },
+        showAbandonButton: { name: '展示抛弃按钮', desc: '展示抛弃操作按钮在每一条任务旁边。' },
+        showDeleteButton: { name: '展示删除按钮', desc: '展示删除操作按钮在每一条任务旁边。' },
       },
       jottingsTodo: {
         title: '乱写的去做',
@@ -258,6 +263,9 @@ export default {
           name: '乱写模板小径',
           desc: '小径去模板者模板为了新的乱写 (例如 模板们/乱写.md)。离开空去使不能。',
         },
+        showPinButton: { name: '展示大头针按钮', desc: '展示大头针操作按钮在每一条任务旁边。' },
+        showAbandonButton: { name: '展示抛弃按钮', desc: '展示抛弃操作按钮在每一条任务旁边。' },
+        showDeleteButton: { name: '展示删除按钮', desc: '展示删除操作按钮在每一条任务旁边。' },
       },
       tmpNote: {
         title: '临时音符',

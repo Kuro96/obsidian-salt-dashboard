@@ -236,6 +236,14 @@ export default {
         fileName: { name: 'Daily File Name', desc: 'e.g. daily.md' },
         statsFile: { name: 'Stats JSON File Path', desc: 'Path to store task completion stats.' },
         crontab: { name: 'Enable Crontab', desc: 'Parse crontab syntax in daily tasks.' },
+        showPinButton: {
+          name: 'Show Pin Button',
+          desc: 'Show the pin action button in each task row.',
+        },
+        showDeleteButton: {
+          name: 'Show Delete Button',
+          desc: 'Show the delete action button in each task row.',
+        },
       },
       regularTodo: {
         title: 'Regular Todo',
@@ -244,6 +252,18 @@ export default {
         autoCreate: {
           name: 'Auto Create File',
           desc: "Create today's file if missing when checking tasks.",
+        },
+        showPinButton: {
+          name: 'Show Pin Button',
+          desc: 'Show the pin action button in each task row.',
+        },
+        showAbandonButton: {
+          name: 'Show Abandon Button',
+          desc: 'Show the abandon action button in each task row.',
+        },
+        showDeleteButton: {
+          name: 'Show Delete Button',
+          desc: 'Show the delete action button in each task row.',
         },
       },
       jottingsTodo: {
@@ -257,6 +277,18 @@ export default {
         template: {
           name: 'Jottings Template Path',
           desc: 'Path to the Templater template for new jottings (e.g. Templates/Jotting.md). Leave empty to disable.',
+        },
+        showPinButton: {
+          name: 'Show Pin Button',
+          desc: 'Show the pin action button in each task row.',
+        },
+        showAbandonButton: {
+          name: 'Show Abandon Button',
+          desc: 'Show the abandon action button in each task row.',
+        },
+        showDeleteButton: {
+          name: 'Show Delete Button',
+          desc: 'Show the delete action button in each task row.',
         },
       },
       tmpNote: {

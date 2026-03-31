@@ -19,6 +19,9 @@ interface TodoItemProps {
   onAbandon: (task: Task) => void;
   onDelete?: (task: Task) => void;
   onUpdate?: (task: Task, newText: string) => void;
+  showPinButton?: boolean;
+  showAbandonButton?: boolean;
+  showDeleteButton?: boolean;
 }
 
 export const TodoItem: React.FC<TodoItemProps> = ({
@@ -28,6 +31,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   onAbandon,
   onDelete,
   onUpdate,
+  showPinButton = true,
+  showAbandonButton = true,
+  showDeleteButton = true,
 }) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -123,14 +129,16 @@ export const TodoItem: React.FC<TodoItemProps> = ({
           </>
         ) : (
           <>
-            <PinButton
-              isPinned={task.isPinned || false}
-              onToggle={() => onPin(task)}
-              title={t('modules.todo.shared.item.pin')}
-            />
+            {showPinButton && (
+              <PinButton
+                isPinned={task.isPinned || false}
+                onToggle={() => onPin(task)}
+                title={t('modules.todo.shared.item.pin')}
+              />
+            )}
 
             {/* Daily tasks do not support abandoning */}
-            {!task.isDaily && (
+            {!task.isDaily && showAbandonButton && (
               <AbandonButton
                 onClick={() => onAbandon(task)}
                 title={t('modules.todo.shared.item.abandon')}
@@ -138,7 +146,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             )}
 
             {/* Delete button (Trash) */}
-            {onDelete && (
+            {onDelete && showDeleteButton && (
               <DeleteButton
                 onClick={() => setIsDeleting(true)}
                 title={t('modules.todo.shared.item.delete')}
