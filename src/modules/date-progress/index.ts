@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from '../../shared/constants';
 
 export const DateProgressModule: DashboardModule = {
   id: 'date-progress',
+  settingsKey: 'dateProgress',
   title: i18n.t('modules.settings.dateProgress.title'),
   icon: 'calendar-clock', // Lucide icon name
   defaultSettings: DEFAULT_SETTINGS.dateProgress,

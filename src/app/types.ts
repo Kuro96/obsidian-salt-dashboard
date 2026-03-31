@@ -39,8 +39,8 @@ export interface Task {
 // 模块布局配置
 export interface ModuleLayout {
   id: string; // 模块唯一标识
-  order: number; // 显示顺序 (Deprecated: use x,y)
-  width: number; // 宽度 (Deprecated: use w)
+  order?: number; // 显示顺序 (Deprecated: use x,y)
+  width?: number; // 宽度 (Deprecated: use w)
   x?: number; // Grid X (0-11)
   y?: number; // Grid Y
   w?: number; // Grid Width (1-12)
@@ -101,16 +101,11 @@ export interface JottingsTodoConfig extends TodoModuleConfig {
 export interface ContributionGraphConfig extends ModuleConfig {
   dataSource: string; // DailyTodo 数据文件路径
   historicDataSource: string; // 归档数据文件路径
-  colorScheme: 'github' | 'monokai'; // 配色方案
   weekStart: number; // 一周起始日
   tooltipEnabled: boolean; // 是否启用悬停提示
-  clickBehavior: 'modal' | 'jump' | 'filter'; // 点击行为
-  jumpTarget: 'regular' | 'daily'; // jump 模式跳转目标
-  cacheExpiry: number; // 缓存有效期（毫秒）
   enableDailyTodo: boolean; // 是否启用 DailyTodo 数据源
   enableRegularTodo: boolean; // 是否启用 RegularTodo 数据源
   enableJottingsTodo: boolean; // 是否启用 JottingsTodo 数据源
-  showPagination: boolean; // 是否显示翻页按钮
 }
 
 // DateProgress 配置
@@ -125,7 +120,6 @@ export interface DateProgressConfig extends ModuleConfig {
 export interface RecentFilesConfig extends ModuleConfig {
   columns: ColumnConfig[]; // 列配置
   defaultFileLimit: number; // 默认文件数
-  mobileFileLimit: number; // 移动端文件数
   creationDateProperty?: string; // Frontmatter 字段名: 创建时间
   modifiedDateProperty?: string; // Frontmatter 字段名: 修改时间
 }
@@ -141,9 +135,6 @@ export interface ColumnConfig {
 // RandomNote 配置
 export interface RandomNoteConfig extends ModuleConfig {
   randomNoteSource: string; // 笔记源查询
-  randomNoteHeight: string; // 固定高度
-  previewLength: number; // 预览字数(桌面)
-  mobilePreviewLength: number; // 预览字数(移动)
 }
 
 // 排序选项
@@ -153,7 +144,6 @@ export type SortOrder = 'asc' | 'desc';
 // TmpNote 配置
 export interface TmpNoteConfig extends ModuleConfig {
   tmpNotePath: string; // 临时笔记路径
-  tmpNoteHeight: string; // 固定高度
 }
 
 // 插件总配置

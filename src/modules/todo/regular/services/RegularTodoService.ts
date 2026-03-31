@@ -1,7 +1,8 @@
 import { TodoBaseService } from '../../shared/services/TodoBaseService';
 import { App, TFile } from 'obsidian';
 import { RegularTodoConfig, Task } from '../../../../app/types';
-import { moment } from 'obsidian';
+import { moment } from '../../../../shared/utils/momentHelper';
+import type { Moment } from 'moment';
 
 export class RegularTodoService extends TodoBaseService {
   protected config: RegularTodoConfig;
@@ -185,7 +186,7 @@ export class RegularTodoService extends TodoBaseService {
     });
   }
 
-  private async getFileForDate(date: moment.Moment, create = false): Promise<TFile | null> {
+  private async getFileForDate(date: Moment, create = false): Promise<TFile | null> {
     const dateFormat = this.config.dateFormat || 'YYMMDD';
     const fileName = `${date.format(dateFormat)}.md`;
     const folderPath = this.config.todoSourceFolder || 'TODO';

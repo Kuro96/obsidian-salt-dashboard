@@ -5,6 +5,10 @@ import HomepagePlugin from '../main';
 interface SettingsContextType {
   settings: HomepageSettings;
   updateSettings: (newSettings: Partial<HomepageSettings>) => Promise<void>;
+  updateModuleSettings: <K extends keyof HomepageSettings>(
+    key: K,
+    patch: Partial<HomepageSettings[K]>
+  ) => Promise<void>;
 }
 
 const SettingsContext = React.createContext<SettingsContextType | undefined>(undefined);
@@ -37,8 +41,18 @@ export const SettingsProvider: React.FC<{
     await plugin.saveSettings();
   };
 
+  const updateModuleSettings = async <K extends keyof HomepageSettings>(
+    key: K,
+    patch: Partial<HomepageSettings[K]>
+  ) => {
+    const current = settings[key];
+    if (typeof current === 'object' && current !== null && !Array.isArray(current)) {
+      await updateSettings({ [key]: { ...current, ...patch } } as Partial<HomepageSettings>);
+    }
+  };
+
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings }}>
+    <SettingsContext.Provider value={{ settings, updateSettings, updateModuleSettings }}>
       {children}
     </SettingsContext.Provider>
   );

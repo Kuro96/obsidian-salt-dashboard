@@ -7,6 +7,7 @@ import { FileSuggest } from '../../../shared/utils/FileSuggest';
 
 export const JottingsTodoModule: DashboardModule = {
   id: 'jottings-todo',
+  settingsKey: 'jottingsTodo',
   title: i18n.t('modules.settings.jottingsTodo.title'),
   icon: 'pen-tool',
   defaultSettings: DEFAULT_SETTINGS.jottingsTodo,

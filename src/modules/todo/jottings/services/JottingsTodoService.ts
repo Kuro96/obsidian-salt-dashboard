@@ -1,7 +1,7 @@
 import { TodoBaseService } from '../../shared/services/TodoBaseService';
 import { App, TFile, Notice } from 'obsidian';
 import { JottingsTodoConfig, Task } from '../../../../app/types';
-import { moment } from 'obsidian';
+import { moment } from '../../../../shared/utils/momentHelper';
 
 export class JottingsTodoService extends TodoBaseService {
   private static pendingAddKeys = new Set<string>();
@@ -36,33 +36,11 @@ export class JottingsTodoService extends TodoBaseService {
     const folderPath = this.config.todoSourceFolder || 'TODO';
     const jottingsPrefix = `${this.config.jottingsFolder || 'jottings'}/`;
 
-    // Optimization: Get files specifically from the folder instead of scanning entire vault
-    // Falls back to getFiles() filtering if folder abstract object not found (rare)
-    const folder = this.app.vault.getAbstractFileByPath(folderPath);
-    let files: TFile[] = [];
-
-    if (folder && 'children' in folder) {
-      // Recursively or flatly get files? Usually TODO folder is flat for daily notes.
-      // But if it has subfolders, we might need recursive.
-      // Obsidian API doesn't have a simple recursive "getFiles in folder".
-      // Let's stick to flat iteration of folder.children for now as it's most common structure.
-      // If users organize TODOs in subfolders, we might need a recursive walker.
-      // For safety and compatibility with complex setups, let's filter getFiles() but optimize the prefix check.
-      // Actually, re-reading: "getFiles() returns all files in vault".
-      // A better approach for performance is iterating folder.children if structure is known.
-      // Given this is a dashboard for "Daily" type workflow, usually flat.
-      // Let's optimize for flat structure but fallback if needed.
-
-      // Iterating folder children
-      files = (folder as any).children.filter(
-        (f: any) => f instanceof TFile && f.extension === 'md'
-      ) as TFile[];
-    } else {
-      // Fallback or if folder doesn't exist yet
-      files = this.app.vault
-        .getFiles()
-        .filter(f => f.path.startsWith(folderPath) && f.extension === 'md');
-    }
+    // Recursively collect all markdown files under folderPath using vault.getFiles().
+    // This is consistent with other modules and supports nested subfolder structures.
+    const files: TFile[] = this.app.vault
+      .getFiles()
+      .filter(f => f.path.startsWith(folderPath + '/') && f.extension === 'md');
 
     const tasks: Task[] = [];
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useObsidianApp } from '../../../app/context/ObsidianContext';
 import { useSettings } from '../../../app/context/SettingsContext';
 import { RandomNoteService, RandomNoteData } from '../services/RandomNoteService';
-import { moment } from 'obsidian';
+import { moment } from '../../../shared/utils/momentHelper';
 import { getFileMtime } from '../../../shared/utils/fileTime';
 
 export const useRandomNote = () => {
@@ -19,7 +19,17 @@ export const useRandomNote = () => {
   const fetchRandomNote = useCallback(
     async (force = false) => {
       const today = moment().format('YYYY-MM-DD');
-      const cacheKey = `homepage-random-note-${today}`;
+      // Include source and global filter in the cache key so stale entries are
+      // invalidated automatically when the user changes these settings.
+      const configFingerprint = [
+        settings.randomNote.randomNoteSource || '',
+        settings.globalFilter || '',
+      ]
+        .join('|')
+        .split('')
+        .reduce((acc, char) => ((acc << 5) - acc + char.charCodeAt(0)) | 0, 0)
+        .toString(36);
+      const cacheKey = `homepage-random-note-${today}-${configFingerprint}`;
 
       if (!force) {
         const cachedPath = localStorage.getItem(cacheKey);
@@ -46,7 +56,7 @@ export const useRandomNote = () => {
       }
       setLoading(false);
     },
-    [service, app, settings.globalFilter]
+    [service, app, settings.globalFilter, settings.randomNote.randomNoteSource]
   );
 
   useEffect(() => {

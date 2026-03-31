@@ -1,7 +1,7 @@
 import { App, TFile } from 'obsidian';
 import { ContributionGraphConfig, HomepageSettings } from '../../../app/types';
 import { DailyStatsManager } from './DailyStatsManager';
-import { moment } from 'obsidian';
+import { moment } from '../../../shared/utils/momentHelper';
 
 export class ContributionGraphService {
   private app: App;

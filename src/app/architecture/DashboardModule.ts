@@ -22,8 +22,16 @@ export interface DashboardModule {
   icon: string;
 
   /**
-   * Default settings for this module.
-   * These will be merged with user settings on plugin load.
+   * The key under which this module's settings are stored in HomepageSettings.
+   * When provided, getAllDefaultSettings() wraps defaultSettings under this key.
+   * External modules that manage their own top-level key should omit this field
+   * and pass a pre-wrapped defaultSettings object instead.
+   */
+  settingsKey?: string;
+
+  /**
+   * Default settings for this module (the config slice, not the full settings object).
+   * Built-in modules should pair this with settingsKey so the registry can wrap it correctly.
    */
   defaultSettings: Record<string, any>;
 

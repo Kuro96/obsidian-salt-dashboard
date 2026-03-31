@@ -90,8 +90,15 @@ export abstract class TodoBaseService {
     const lines = content.split('\n');
 
     if (task.lineNumber >= 0 && task.lineNumber < lines.length) {
-      // Verify we are looking at the right line (simple check)
-      // Ideally we check ID, but line number is what we have.
+      // Verify the target line still contains the expected task text before modifying.
+      // This guards against concurrent edits between read and write.
+      const line = lines[task.lineNumber];
+      if (task.text && !line.includes(task.text)) {
+        console.warn(
+          `[TodoBaseService] Line ${task.lineNumber} in "${task.sourcePath}" no longer matches task text. Skipping write to avoid data corruption.`
+        );
+        return;
+      }
 
       const result = callback(lines, task.lineNumber);
 

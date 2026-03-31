@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from '../../../shared/constants';
 
 export const DailyTodoModule: DashboardModule = {
   id: 'daily-todo',
+  settingsKey: 'dailyTodo',
   title: i18n.t('modules.settings.dailyTodo.title'),
   icon: 'calendar-check',
   defaultSettings: DEFAULT_SETTINGS.dailyTodo,

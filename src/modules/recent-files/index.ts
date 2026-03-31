@@ -7,6 +7,7 @@ import { FileSuggest } from '../../shared/utils/FileSuggest';
 
 export const RecentFilesModule: DashboardModule = {
   id: 'recent-files',
+  settingsKey: 'recentFiles',
   title: i18n.t('modules.settings.recentFiles.title'),
   icon: 'file-clock',
   defaultSettings: DEFAULT_SETTINGS.recentFiles,

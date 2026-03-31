@@ -2,8 +2,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDateProgress } from '../hooks/useDateProgress';
 import { useLayout } from '../../../app/hooks/useLayout';
-import { moment } from 'obsidian';
-import { getLocalizedMoment } from '../../../shared/utils/momentHelper';
+import { moment, getLocalizedMoment } from '../../../shared/utils/momentHelper';
 
 export const DateProgress: React.FC = () => {
   const { t } = useTranslation();

@@ -1,7 +1,6 @@
 import { App } from 'obsidian';
 import { DateProgressConfig } from '../../../app/types';
-import { moment } from 'obsidian';
-import { getLocalizedMoment } from '../../../shared/utils/momentHelper';
+import { moment, getLocalizedMoment } from '../../../shared/utils/momentHelper';
 import { getFileMtime, getFileCtime } from '../../../shared/utils/fileTime';
 
 export interface DateInfo {

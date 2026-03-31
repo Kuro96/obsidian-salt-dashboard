@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from '../../shared/constants';
 
 export const ContributionGraphModule: DashboardModule = {
   id: 'contribution-graph',
+  settingsKey: 'contributionGraph',
   title: i18n.t('modules.settings.contributionGraph.title'),
   icon: 'activity',
   defaultSettings: DEFAULT_SETTINGS.contributionGraph,
@@ -38,21 +39,6 @@ export const ContributionGraphModule: DashboardModule = {
           settings.contributionGraph.enableJottingsTodo = value;
           await (plugin as any).saveSettings();
         })
-      );
-
-    new Setting(containerEl)
-      .setName(i18n.t('modules.settings.contributionGraph.click.name'))
-      .setDesc(i18n.t('modules.settings.contributionGraph.click.desc'))
-      .addDropdown(drop =>
-        drop
-          .addOption('modal', i18n.t('modules.settings.contributionGraph.click.options.modal'))
-          .addOption('jump', i18n.t('modules.settings.contributionGraph.click.options.jump'))
-          .addOption('filter', i18n.t('modules.settings.contributionGraph.click.options.filter'))
-          .setValue(settings.contributionGraph.clickBehavior)
-          .onChange(async (value: any) => {
-            settings.contributionGraph.clickBehavior = value;
-            await (plugin as any).saveSettings();
-          })
       );
   },
 };

@@ -105,10 +105,6 @@ export const useJottingsTodo = () => {
     await service.deleteTask(task);
   };
 
-  const toggleSort = () => {
-    setSortByName(prev => !prev);
-  };
-
   return {
     tasks,
     loading,

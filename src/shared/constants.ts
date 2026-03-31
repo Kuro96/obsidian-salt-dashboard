@@ -1,4 +1,4 @@
-import { HomepageSettings } from './types';
+import { HomepageSettings } from '../app/types';
 
 export const VIEW_TYPE_HOMEPAGE = 'homepage-dashboard-view';
 
@@ -110,16 +110,11 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
   contributionGraph: {
     dataSource: 'SCRIPTS/data/daily_stats.json',
     historicDataSource: 'SCRIPTS/data/daily_stats_historic.json',
-    colorScheme: 'github',
     weekStart: 0,
     tooltipEnabled: true,
-    clickBehavior: 'modal',
-    jumpTarget: 'regular',
-    cacheExpiry: 7200000, // 2小时
     enableDailyTodo: true,
     enableRegularTodo: true,
     enableJottingsTodo: true,
-    showPagination: true,
   },
 
   // Daily TODO
@@ -159,7 +154,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
   // 近期文档
   recentFiles: {
     defaultFileLimit: 6,
-    mobileFileLimit: 5,
     creationDateProperty: 'create_date',
     modifiedDateProperty: 'modified_date',
     columns: [
@@ -173,14 +167,10 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
   // 随机笔记
   randomNote: {
     randomNoteSource: '(-"SCRIPTS") and (-"TODO") and (-"VIEWS")',
-    randomNoteHeight: '300px',
-    previewLength: 300,
-    mobilePreviewLength: 150,
   },
 
   // 临时笔记
   tmpNote: {
     tmpNotePath: 'works/tmp/tmp.md',
-    tmpNoteHeight: '250px',
   },
 };

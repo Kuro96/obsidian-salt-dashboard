@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from '../../../shared/constants';
 
 export const RegularTodoModule: DashboardModule = {
   id: 'regular-todo',
+  settingsKey: 'regularTodo',
   title: i18n.t('modules.settings.regularTodo.title'),
   icon: 'check-square',
   defaultSettings: DEFAULT_SETTINGS.regularTodo,

@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from '../../shared/constants';
 
 export const TmpNoteModule: DashboardModule = {
   id: 'tmp-note',
+  settingsKey: 'tmpNote',
   title: i18n.t('modules.settings.tmpNote.title'),
   icon: 'sticky-note',
   defaultSettings: DEFAULT_SETTINGS.tmpNote,

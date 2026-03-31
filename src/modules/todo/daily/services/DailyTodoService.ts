@@ -3,7 +3,7 @@ import { App, TFile } from 'obsidian';
 import { DailyTodoConfig, Task } from '../../../../app/types';
 import { DailyStatsManager } from '../../../contribution-graph/services/DailyStatsManager';
 import { CrontabParser } from '../../../../shared/utils/crontabParser';
-import { moment } from 'obsidian';
+import { moment } from '../../../../shared/utils/momentHelper';
 
 export class DailyTodoService extends TodoBaseService {
   protected config: DailyTodoConfig;

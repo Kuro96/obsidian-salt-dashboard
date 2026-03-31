@@ -1,5 +1,6 @@
-import { CrontabExpression, CrontabField } from '../types';
-import { moment } from 'obsidian';
+import { CrontabExpression, CrontabField } from '../../app/types';
+import { moment } from './momentHelper';
+import type { Moment } from 'moment';
 
 export class CrontabParser {
   private static FIELD_RANGES = {

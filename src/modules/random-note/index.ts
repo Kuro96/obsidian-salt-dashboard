@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from '../../shared/constants';
 
 export const RandomNoteModule: DashboardModule = {
   id: 'random-note',
+  settingsKey: 'randomNote',
   title: i18n.t('modules.settings.randomNote.title'),
   icon: 'dice',
   defaultSettings: DEFAULT_SETTINGS.randomNote,

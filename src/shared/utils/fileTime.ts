@@ -1,4 +1,5 @@
-import { App, TFile, moment } from 'obsidian';
+import { App, TFile } from 'obsidian';
+import { moment } from './momentHelper';
 
 /**
  * Gets the modification time of a file, preferring the frontmatter property over the file system stat.
