@@ -1,6 +1,6 @@
 ---
 title: Salt Dashboard PRD
-description: 产品需求文档 - Obsidian Salt Dashboard 插件
+description: 产品需求与当前实现对齐文档 - Obsidian Salt Dashboard 插件
 categories:
 tags:
   - homepage
@@ -8,368 +8,274 @@ tags:
   - plugin
   - prd
 create_date: 2026-02-09T18:27
-modified_date: 2026-03-19T00:00
+modified_date: 2026-03-31T00:00
 cssclasses:
   - wide-view
 status: draft
-version: 1.0.8
+version: 0.1.1
 ---
 
-## Salt Dashboard - 产品需求文档 (PRD)
+## Salt Dashboard - 产品需求文档
 
-### 📋 项目概述
+### 项目概述
 
 #### 项目名称
 
-**Salt Dashboard** (中文名：Salt 仪表盘)
+**Salt Dashboard**
 
 #### 项目背景
 
-替代原有的 DataviewJS 脚本 (`homepage.js`)，解决以下痛点:
-
-- 依赖 Dataview 插件，启动和渲染性能较差
-- 无法在非 Dataview 块中使用
-- 配置管理分散，用户体验不佳
-- 缺少原生 Obsidian API 支持
-- 移动端优化不足
+该插件用于替代原有 DataviewJS 版首页脚本 `homepage.js`，目标是把首页能力迁移到独立 Obsidian 插件中，减少 Dataview 依赖，提供更完整的设置界面、更稳定的原生 API 集成和更好的移动端体验。
 
 #### 项目目标
 
-构建一个独立的 Obsidian 插件，实现:
+1. 用原生 Obsidian API 与 React 渲染替代 DataviewJS 方案。
+2. 提供图形化设置面板，降低配置门槛。
+3. 以微内核 + 模块注册表方式支持内置模块和外部扩展模块。
+4. 优化移动端体验与触摸交互。
+5. 提供中英文与扩展语言支持。
 
-1. **性能优化**: 脱离 Dataview，使用原生 API 和 React 渲染
-2. **用户体验**: 提供图形化设置界面，降低配置门槛
-3. **扩展性**: 微内核+插件架构，支持第三方扩展和用户自定义模块
-4. **稳定性**: 完整的错误处理和数据备份机制
-5. **移动优先**: 完善的移动端适配和触摸交互
-6. **国际化**: 支持多语言界面（中/英文）
+#### 当前状态 (v0.1.1)
 
-#### 当前状态 (v1.0.8)
+已实现：
 
-✅ **已完成核心功能**:
-
-- 微内核架构与模块注册系统
-- 响应式网格布局（支持拖拽、调整大小）
-- 动态设置面板与模块化配置
-- 国际化支持（中英文）
-- 8个内置功能模块
+- 微内核式模块注册与动态设置面板
+- 响应式网格布局、拖拽与尺寸调整
+- 8 个内置模块
 - 外部插件加载机制
+- 多语言支持与语言切换设置
+- TODO 模块统一提交流程与重复提交保护
 
-🔧 **进行中**:
+当前技术债：
 
-- 全面的单元测试
-- 类型定义清理与优化
-- TODO 模块新增任务流程统一为单一提交入口并增加防重复提交保护，避免同一交互写入多条相同任务
-- TODO 模块新增提交流程已抽离为共享状态 hook，在统一防重入的同时保留各模块独立业务规则
+- TypeScript 类型系统尚未收敛，当前存在 `tsc --noEmit` 错误
+- 模块默认配置协议不统一
+- 若干配置项已声明但运行时未真正接入
+- 测试基础设施已存在，但自动化覆盖仍然很少
 
 ---
 
-### 🎯 核心功能
+### 核心能力
 
 #### 1. 响应式网格布局系统
 
-##### 功能描述
-
-基于 `react-grid-layout` 实现的动态网格布局系统，支持拖拽、调整大小和响应式适配。
-
-##### 核心特性
-
-- **12列网格系统**:
-  - 桌面端使用 12 列网格布局，支持模块宽度 1-12 精细调整
-  - 模块坐标与尺寸 (x, y, w, h) 持久化存储
-  - 默认布局预定义于 `DEFAULT_SETTINGS.layout.modules`
-- **拖拽与调整大小**:
-  - 每个模块右上角显示拖拽手柄（Grip 图标）
-  - **交互限制**: 仅当拖动手柄时才能移动模块，避免误触
-  - 支持模块边缘调整大小，自动吸附到网格列数
-- **响应式适配**:
-  - **断点定义**:
-    - `lg` (≥1200px): 12列
-    - `md` (≥996px): 12列
-    - `sm` (≥768px): 6列（平板）
-    - `xs` (≥480px): 4列（大屏手机）
-    - `xxs` (<480px): 2列（小屏手机）
-  - **自适应宽度逻辑**:
-    - 平板端: 大模块占满宽度，小模块占半宽
-    - 移动端: 强制单列堆叠，所有模块占满宽度
-  - 自动重新排列避免空白区域
-- **布局管理**:
-  - `LayoutManager` 服务负责同步布局配置
-  - 支持"恢复默认布局"功能
-  - 自动检测新模块并添加到布局
-  - 清理孤立模块配置（设置面板）
+- 基于 `react-grid-layout` 实现模块化首页布局。
+- 桌面端使用 12 列网格；平板和移动端按断点压缩列数并自动重排。
+- 模块位置和尺寸以 `(x, y, w, h)` 持久化到设置中。
+- 支持拖拽排序与模块边缘缩放。
+- 仅拖拽手柄可触发模块移动，避免误触内容区域。
+- `LayoutManager` 在启动和模块变更时同步布局，并支持恢复默认布局。
 
 #### 2. 动态设置面板
 
-##### 功能描述
+- 设置页基于模块注册表动态渲染。
+- 通用设置包含：
+  - 启动时自动打开 Dashboard
+  - TODO 源文件夹配置
+  - 全局过滤器
+  - 自定义插件目录
+  - 语言选择（System / EN / ZH / ZH-Meme）
+- 支持启用/禁用模块。
+- 仅在模块启用时显示其设置区域。
+- 支持重载外部插件、清理孤立模块配置、恢复默认布局、恢复初始设置与撤销恢复。
 
-基于模块注册表动态生成的插件配置界面，提供统一的设置管理体验。
+#### 3. 国际化
 
-##### 核心特性
-
-- **通用设置**:
-  - 启动时自动打开仪表盘
-  - TODO 源文件夹配置（应用于所有待办模块）
-  - **全局过滤器**:
-    - 应用于"近期文档"和"随机笔记"模块
-    - 支持逻辑运算符 (AND, OR, NOT)、标签 (#tag) 和路径字符串 ("folder")
-    - 使用 `SourceParser` 解析 Dataview 风格查询
-    - 默认排除: SCRIPTS, TODO, Templates 文件夹
-- **扩展模块管理**:
-  - 自定义插件文件夹配置
-  - 支持加载外部 `.js`/`.jsx` 插件文件
-  - 实时重新加载插件
-  - 清理孤立模块配置
-- **活动模块管理**:
-  - 可视化模块开关（启用/禁用）
-  - 模块禁用时自动隐藏其设置区域
-  - 待办模块与贡献图数据源自动同步
-- **动态模块配置**:
-  - 每个模块通过 `renderSettings` 方法定义自己的配置 UI
-  - 设置面板遍历 `ModuleRegistry` 动态加载模块配置
-  - 模块配置仅在模块启用时显示
-- **布局管理**:
-  - 一键重置布局到默认配置
-- **危险区域**:
-  - **恢复初始设置**: 重置所有插件配置为默认值（需二次确认）
-  - **撤销恢复**: 仅在重置操作后出现，允许撤销上一次重置
-
-#### 3. 国际化 (i18n)
-
-##### 功能描述
-
-基于 `i18next` 和 `react-i18next` 的多语言支持，自动适配 Obsidian 界面语言。
-
-##### 核心特性
-
-- **多语言支持**:
-  - 默认支持英语 (`en`)、简体中文 (`zh`, `zh-cn`, `zh-CN`, `zh-tw`, `zh-TW`) 以及机翻生草中文 (`zh-meme`)
-  - 语言资源文件独立管理于 `src/i18n/locales/`
-  - 易于扩展其他语言（添加新语言文件并注册）
-- **自动检测与切换**:
-  - 优先使用 `moment.locale()` 检测 Obsidian 界面语言
-  - 支持通过 `window.localStorage.getItem('language')` 覆盖
-  - 语言切换需重启插件或重载布局
-- **翻译覆盖范围**:
-  - 设置面板：所有标签、描述、按钮文本
-  - 命令面板：命令名称、Ribbon 图标提示
-  - 模块界面：模块标题、按钮、提示、占位符、错误信息
-  - 待办任务：状态标签、操作按钮
-  - 贡献图：工具提示、模态框内容
-- **技术实现**:
-  - `I18nextProvider` 包裹整个 React 应用
-  - 使用 `useTranslation` hook 获取翻译函数
-  - 模块标题通过 `DraggableModule` 动态本地化
+- 基于 `i18next` 与 `react-i18next`。
+- 当前支持：`en`、`zh` 系列、`zh-meme`。
+- 覆盖设置面板、模块标题、模块内按钮与提示文案。
+- 支持通过插件设置显式切换语言，而不是只依赖 Obsidian 默认语言。
 
 ---
 
-### 🧩 模块化架构 (Modular Architecture)
+### 模块化架构
 
-> 本项目采用微内核架构，所有功能模块均作为"插件"注册到系统中。
+#### 核心结构
 
-#### 核心概念
+1. `ModuleRegistry`
 
-1.  **ModuleRegistry (模块注册表)**:
-    - 单例模式，管理所有可用模块的生命周期
-    - 提供 `register(module)`, `getModule(id)`, `getAllModules()` 接口
-    - 支持订阅注册表变更（用于 UI 刷新）
-    - 插件启动时，所有内置模块自动注册到注册表
+- 统一管理内置模块和外部模块。
+- 提供注册、查询、遍历与订阅能力。
 
-2.  **DashboardModule (模块接口)**:
-    所有模块必须实现以下接口：
+2. `DashboardModule`
 
-    ```typescript
-    interface DashboardModule {
-      id: string; // 唯一标识 (e.g., "recent-files")
-      title: string; // 显示名称（支持 i18n key）
-      icon: string; // 图标（Lucide 图标名或 SVG）
-      defaultSettings: Record<string, any>; // 模块默认配置
-      defaultLayout?: {
-        // 可选默认布局配置
-        w?: number; // 默认宽度（1-12）
-        h?: number; // 默认高度（行单位）
-        showTitle?: boolean; // 是否显示标题
-      };
-      component: React.ComponentType<any>; // 渲染组件
-      renderSettings: (
-        containerEl: HTMLElement,
-        plugin: Plugin,
-        settings: HomepageSettings
-      ) => void;
-    }
-    ```
+- 每个模块定义自己的 `id`、标题、图标、默认布局、React 组件与设置渲染逻辑。
+- 当前代码中 `defaultSettings` 协议仍需进一步收敛，这是已知技术债。
 
-3.  **上下文注入 (Context Injection)**:
-    - `ObsidianContext`: 提供 `app` (Obsidian App 实例)
-    - `SettingsContext`: 提供 `settings` (完整配置), `updateSettings()` (配置更新回调)
-    - 模块组件通过 `useObsidian()` 和 `useSettings()` hooks 访问上下文
-    - 支持模块间的松散耦合通信（如贡献图监听待办模块数据变化）
+3. 上下文注入
+
+- `ObsidianContext` 提供 `app` 和插件实例。
+- `SettingsContext` 提供当前设置与更新入口。
+- 模块通过 hooks 获取上下文，并在各自 service 中调用 Obsidian API。
 
 #### 内置模块列表
 
-##### 1. 日期与进度模块 (DateProgressModule)
+##### 1. Date Progress
 
 - **ID**: `date-progress`
-- **功能**: 显示当前日期、星期、季度、周数、年度进度和笔记统计。
-- **配置项**: `showStats` (显示统计), `excludeFolders` (排除文件夹)
-- **特性**:
-  - 仿真撕页日历样式
-  - 年度进度条可视化（智能定位）
-  - 实时笔记统计（总数、本周/今日修改/新增）
+- **功能**: 显示日期、星期、周数、季度、年度进度和笔记统计。
+- **已实现配置**:
+  - `showStats`
+- **已存在但未在设置页暴露的配置**:
+  - `excludeFolders`
+- **实现特性**:
+  - 撕页日历视觉风格
+  - 年度进度条与日期信息联动展示
+  - 基于 Vault 文件统计今日、本周、总量等信息
 
-##### 2. 活跃度图表模块 (ContributionGraphModule)
+##### 2. Contribution Graph
 
 - **ID**: `contribution-graph`
-- **功能**: GitHub 风格的年度活跃度热力图，可视化每日任务完成情况。
-- **配置项**: `enableDailyTodo`, `enableRegularTodo`, `enableJottingsTodo`, `clickBehavior` (点击行为)
-- **特性**:
-  - 53周×7天网格布局，5级颜色深度
-  - 支持三种点击行为：弹窗详情、跳转文件、筛选任务
-  - 自动从三个待办模块收集数据
-  - 支持按月/按年翻页查看历史数据
+- **功能**: GitHub 风格年度活跃度热力图，基于待办模块数据统计每日完成量。
+- **当前已稳定工作的配置**:
+  - `enableDailyTodo`
+  - `enableRegularTodo`
+  - `enableJottingsTodo`
+- **当前代码中已声明但未完整接入的配置**:
+  - `clickBehavior`
+  - `jumpTarget`
+  - `colorScheme`
+  - `cacheExpiry`
+  - `showPagination`
+- **实现特性**:
+  - 53 周 × 7 天网格
+  - 颜色深度按数量变化
+  - 可汇总三个 TODO 模块的数据源
+- **当前限制**:
+  - 点击行为尚未达到文档层面的 modal / jump / filter 全量能力
+  - `TaskDetailModal` 组件已存在，但当前主流程未真正接入
 
-##### 3. 待办任务管理系统
+##### 3. TODO 模块体系
 
-采用面向对象继承架构，共享 `TodoBaseService` 基础逻辑。
+共享基础：
 
-- **3.1 日常待办模块 (DailyTodoModule)**
-  - **ID**: `daily-todo`
-  - **功能**: 管理每日重复的日常任务，支持简化 crontab 语法调度。
-  - **配置项**: `dailyFileName`, `enableCrontab`
-  - **特性**:
-    - 任务完成状态独立存储于 `daily_stats.json`
-    - 置顶状态 (`- [!]`) 持久化到源文件
-    - 支持 crontab 表达式控制任务显示日期
+- 三个 TODO 模块共用 `TodoBaseService` 的部分解析和写回逻辑。
+- 新增任务流程已统一为共享提交状态管理，并增加同步锁与幂等保护，减少重复写入。
+- 当前写回仍主要依赖 `lineNumber`，这是需要继续加固的技术债。
+- 桌面端任务行操作按钮默认收起，在 hover 行时展开并参与布局，因此会重新挤压文本；移动端与平板端继续保留文本和按钮的显式间隔布局。
+- TODO 模块支持按模块配置是否显示 `pin`、`abandon`、`delete` 行内操作按钮。
+- TODO 列表滚动容器保留稳定的 scrollbar gutter，用于降低编辑时临时锁滚动导致的文本重排与选区抖动。
 
-- **3.2 常规待办模块 (RegularTodoModule)**
-  - **ID**: `regular-todo`
-  - **功能**: 管理按日期独立的每日任务文件（如 `260209.md`）。
-  - **配置项**: `dateFormat`, `autoCreateFile`
-  - **特性**:
-    - 每日任务独立文件，完成后直接修改文件内容
-    - 自动创建今日文件（可选）
-    - 支持任务筛选（进行中/已完成/已放弃）
+###### 3.1 Daily Todo
 
-- **3.3 随手记待办模块 (JottingsTodoModule)**
-  - **ID**: `jottings-todo`
-  - **功能**: 管理与 jottings 笔记链接的任务，完成时自动更新笔记标签。
-  - **配置项**: `jottingsFolder`, `doneTag`, `abandonedTag`, `templatePath`
-- **特性**:
-  - 自动扫描包含 `[[jottings/xxx]]` 链接的任务
-  - 完成任务时自动更新笔记标签（`jottings` → `jottings/done`）
-  - 支持 Templater 模板创建新 jottings 笔记
-  - 新增任务时同时使用交互层提交锁和 service 层短窗口幂等保护，避免重复写入
-  - 删除 Jottings TODO 任务时，同时将关联的 Jottings 笔记移入回收站
+- **ID**: `daily-todo`
+- **功能**: 管理每日重复任务，支持简化 crontab 调度。
+- **配置项**:
+  - `dailyFileName`
+  - `dailyStatsPath`
+  - `enableCrontab`
+- **实现特性**:
+  - 完成状态独立记录到统计文件
+  - 支持置顶、筛选、排序
+  - 支持 Today / Future 视图与下次触发时间计算
+  - 支持配置是否显示 pin / delete 操作按钮
 
-- **3.4 待办模块交互一致性**
-  - Daily / Regular / Jottings 三类 TODO 模块的新增任务统一使用单一提交流程
-  - 回车、确认按钮与附加输入控件确认事件共享同一提交函数，并带有提交中防重入保护
-  - 防重入不仅依赖 React state，也使用同步锁处理 state 尚未刷新前的重复触发
-  - 共享 hook 只负责提交状态与重置时机，具体提交内容仍由各模块自行定义
+###### 3.2 Regular Todo
 
-##### 4. 近期文档模块 (RecentFilesModule)
+- **ID**: `regular-todo`
+- **功能**: 管理按日期分文件的常规待办。
+- **配置项**:
+  - `dateFormat`
+  - `autoCreateFile`
+- **实现特性**:
+  - 支持状态筛选
+  - 支持按日期文件组织任务
+  - 可按配置自动创建当日文件
+  - 支持配置是否显示 pin / abandon / delete 操作按钮
+
+###### 3.3 Jottings Todo
+
+- **ID**: `jottings-todo`
+- **功能**: 管理与 Jottings 笔记关联的待办任务。
+- **配置项**:
+  - `jottingsFolder`
+  - `doneTag`
+  - `abandonedTag`
+  - `templatePath`
+- **实现特性**:
+  - 支持识别 `[[path]]` 与 `[[path|alias]]`
+  - 完成任务时更新关联笔记标签
+  - 删除任务时可同时删除关联 Jottings 笔记
+  - 支持基于模板创建新 Jottings 笔记
+  - 支持配置是否显示 pin / abandon / delete 操作按钮
+
+##### 4. Recent Files
 
 - **ID**: `recent-files`
-- **功能**: 多列展示不同分类的近期文档，支持自定义列配置。
-- **配置项**: `columns` (列配置), `defaultFileLimit`, `creationDateProperty`, `modifiedDateProperty`
-- **特性**:
-  - 动态列配置（标题、数据源查询、Templater 模板）
-  - 支持全局过滤器
-  - 原生悬停预览 (Hover Preview)
-  - 响应式列数（桌面4列、平板2列、移动1列）
+- **功能**: 按多列展示不同来源的近期文件。
+- **当前主要配置**:
+  - `columns`
+  - `defaultFileLimit`
+  - `creationDateProperty`
+  - `modifiedDateProperty`
+- **实现特性**:
+  - 列级数据源配置
+  - 全局过滤器接入
+  - 原生 Hover Preview
+  - 快速创建笔记
+  - 模板文件建议器
+  - frontmatter pin 状态切换
+- **当前限制**:
+  - `mobileFileLimit` 已声明，但运行时未真正使用
 
-##### 5. 随机笔记模块 (RandomNoteModule)
+##### 5. Random Note
 
 - **ID**: `random-note`
-- **功能**: 每日自动/手动切换展示随机笔记预览。
-- **配置项**: `randomNoteSource` (查询), `previewLength`, `mobilePreviewLength`
-- **特性**:
-  - 基于日期的缓存随机选择
-  - 支持全局过滤器
-  - 原生悬停预览
-  - 可调整预览高度
+- **功能**: 展示每日随机笔记预览，并支持手动刷新。
+- **当前主要配置**:
+  - `randomNoteSource`
+- **实现特性**:
+  - 基于日期的随机缓存
+  - 接入全局过滤器
+  - 支持 Hover Preview
+- **当前限制**:
+  - `previewLength`、`mobilePreviewLength`、`randomNoteHeight` 已声明，但运行时尚未完整接入
+  - 当前缓存 key 未完全绑定过滤条件与来源配置，设置变更后可能在当天命中旧缓存
 
-##### 6. 临时笔记模块 (TmpNoteModule)
+##### 6. Tmp Note
 
 - **ID**: `tmp-note`
-- **功能**: 展示临时笔记文件的内容预览，用于快速记录和查看。
-- **配置项**: `tmpNotePath`, `tmpNoteHeight`
-- **特性**:
-  - 低调设计（默认折叠，细边框）
-  - 实时预览临时笔记内容
-  - 展开后显示"打开文件"按钮
+- **功能**: 显示临时笔记内容，便于快速查看与打开。
+- **当前主要配置**:
+  - `tmpNotePath`
+- **实现特性**:
+  - 默认轻量展示
+  - 展开后可直接打开源文件
+- **当前限制**:
+  - `tmpNoteHeight` 已声明，但运行时尚未接入
 
 #### 外部插件支持
 
-##### 功能描述
-
-支持从自定义文件夹加载用户编写的第三方模块，扩展仪表盘功能边界。
-
-##### 核心特性
-
-- **插件加载机制**:
-  - 从 `customPluginFolder` 配置的文件夹加载 `.js`/`.jsx` 文件
-  - 支持 JSX 实时转译（使用 sucrase）
-  - 自动注册符合 `DashboardModule` 接口的模块
-- **运行环境**:
-  - 提供 `require` shim 支持 `react` 和 `obsidian` 模块
-  - 模块导出支持 CommonJS 或 ES Module 格式
-- **管理功能**:
-  - 设置面板提供"重新加载插件"按钮
-  - 自动同步新模块到布局配置
-  - 清理孤立模块配置
+- 从配置目录加载 `.js` / `.jsx` / `.cjs` 外部模块。
+- 支持运行时重载与同步到布局。
+- 当前通过动态执行脚本注入 `react`、`obsidian` 等依赖。
+- 当前缺少更严格的类型和 runtime shape 校验，这是后续重构重点之一。
 
 ---
 
-### 🎨 UI/UX 设计规范
+### UI / UX 原则
 
-#### 响应式布局实现
-
-- **移动优先设计**: 所有模块组件适配移动端 (`< 640px`)
-- **网格自适应策略**:
-  - **桌面端 (≥1200px)**: 12列网格，模块按配置宽度显示
-  - **平板端 (768px-1199px)**: 6列网格，大模块占满宽度，小模块占半宽
-  - **移动端 (<768px)**: 4列或2列网格，强制单列堆叠
-- **自适应宽度逻辑** (`GridLayout.tsx`):
-  - 平板端: 原始宽度≥8列的模块强制占满宽度(6列)，4-7列模块占半宽(3列)
-  - 移动端: 所有模块占满可用宽度
-  - 自动重新排列避免空白区域
-
-#### 视觉设计
-
-- **模块卡片设计**:
-  - 统一卡片样式: 圆角边框、阴影、内边距
-  - 标题栏可配置显示/隐藏
-  - 拖拽手柄位于右上角（Grip 图标）
-- **主题适配**:
-  - 使用 Obsidian CSS 变量 (`--background-primary`, `--text-normal` 等)
-  - 自动检测深色/浅色模式 (`theme-dark` 类)
-  - 贡献图配色方案适配主题 (`github` 或 `monokai`)
-- **动画与过渡**:
-  - 模块悬停效果: 背景色变化 + 左边框高亮
-  - 折叠/展开动画: 平滑高度过渡
-  - 进度条填充动画: 宽度渐变
-
-#### 交互规范
-
-- **链接预览**: 所有文件链接使用 `<a class="internal-link" data-href="...">` 结构，触发 Obsidian 原生悬停预览
-- **拖拽交互**:
-  - 仅拖拽手柄可触发模块移动，避免内容误触
-  - 调整大小限制在模块边缘
-  - 拖拽时显示占位符（虚线框）
-- **模块头部操作**:
-  - 操作按钮绝对定位在右上角（紧邻拖拽手柄）
-  - 统一按钮样式: 24×24px，悬停背景色变化
-  - 移动端收纳到齿轮菜单
-- **设置面板交互**:
-  - 模块配置使用折叠面板节省垂直空间
-  - 危险操作需二次确认（按钮变为"Are you sure?"）
-  - 实时保存配置变更
+- 保持 Obsidian 原生视觉风格，优先复用主题变量。
+- 模块头部操作与拖拽手柄分离，避免误触。
+- 移动端优先保证可读性和点击目标大小。
+- 允许正文文本选择，不对整块内容绑定宽泛点击事件。
+- 下拉层、头部操作、悬浮控件需保证正确的层级关系，避免被内容区域遮挡。
 
 ---
 
-### 🛠️ 技术架构
+### 已知实现偏差
 
-> 详细的技术架构文档已移动至: [Technical Architecture](docs/architecture.md)
+以下内容是当前实现与理想产品定义之间的差距，需要在后续版本中逐步收敛：
+
+1. TypeScript 类型基线尚未恢复，当前存在编译错误。
+2. `DashboardModule.defaultSettings` 协议不统一。
+3. `Contribution Graph` 多个高级配置项尚未真正实现。
+4. `Random Note`、`Tmp Note`、`Recent Files` 中存在已声明但未接线的配置项。
+5. TODO 文件写回主要依赖行号，仍有并发修改风险。
+6. 自动化测试基础设施存在，但覆盖率仍不足以为重构提供强保护。
 
 ---
+
+### 技术架构文档
+
+详细实现说明见 `docs/architecture.md`。
