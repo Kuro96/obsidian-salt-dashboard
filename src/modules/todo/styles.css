@@ -2,6 +2,7 @@
 .task-list {
   overscroll-behavior: contain;
   position: relative;
+  scrollbar-gutter: stable;
 }
 
 .todoItem {
