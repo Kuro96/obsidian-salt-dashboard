@@ -314,10 +314,10 @@ export default {
         },
         columns: {
           heading: 'Columns',
-          desc: "Configure the columns displayed in the Recent Files module. The 'Source' field supports Dataview-like queries.",
+          desc: "Configure the columns displayed in the Recent Files module. The 'Source' field supports Dataview-like queries plus frontmatter filters such as `.property` and `.property=value`.",
           placeholder: 'Column Title',
           sourceLabel: 'Source Query:',
-          sourcePlaceholder: 'e.g. "Folder" AND #tag',
+          sourcePlaceholder: 'e.g. "Folder" AND #tag AND .status=active',
           templateLabel: 'Templater Template Path:',
           templatePlaceholder: 'Leave blank for empty note. Example: @tmp/notes.md',
           addBtn: '+ Add Column',

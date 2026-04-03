@@ -1,6 +1,16 @@
-import { TFile, App, getAllTags } from 'obsidian';
+import { TFile, App, FrontMatterCache, getAllTags } from 'obsidian';
 
-type TokenType = 'AND' | 'OR' | 'NOT' | 'LPAREN' | 'RPAREN' | 'TAG' | 'STRING' | 'EOF';
+type TokenType =
+  | 'AND'
+  | 'OR'
+  | 'NOT'
+  | 'LPAREN'
+  | 'RPAREN'
+  | 'TAG'
+  | 'PROPERTY'
+  | 'EQUALS'
+  | 'STRING'
+  | 'EOF';
 
 interface Token {
   type: TokenType;
@@ -13,6 +23,7 @@ interface ASTNode {
   right?: ASTNode;
   expr?: ASTNode;
   value?: string;
+  property?: string;
 }
 
 export class SourceParser {
@@ -69,6 +80,12 @@ export class SourceParser {
         continue;
       }
 
+      if (char === '=') {
+        tokens.push({ type: 'EQUALS' });
+        i++;
+        continue;
+      }
+
       // Negation: ! or -
       // But - could be part of a word or tag if not separated
       // DQL: -#tag is negation. -"folder" is negation.
@@ -121,6 +138,20 @@ export class SourceParser {
         }
         tokens.push({ type: 'TAG', value: val });
         continue;
+      }
+
+      if (char === '.') {
+        let val = '';
+        i++;
+        while (i < source.length && /[a-zA-Z0-9_-]/.test(source[i])) {
+          val += source[i];
+          i++;
+        }
+
+        if (val) {
+          tokens.push({ type: 'PROPERTY', value: val });
+          continue;
+        }
       }
 
       // Word / Identifier / Unquoted String
@@ -199,6 +230,23 @@ export class SourceParser {
       return { type: 'TAG', value: token.value };
     }
 
+    if (this.check('PROPERTY')) {
+      const token = this.advance();
+
+      if (this.match('EQUALS')) {
+        const valueToken = this.consumeValueToken();
+        if (valueToken) {
+          return {
+            type: 'PROPERTY_EQUALS',
+            property: token.value,
+            value: valueToken.value,
+          };
+        }
+      }
+
+      return { type: 'PROPERTY_EXISTS', property: token.value };
+    }
+
     if (this.check('STRING')) {
       const token = this.advance();
       return { type: 'STRING', value: token.value };
@@ -240,6 +288,13 @@ export class SourceParser {
     return null;
   }
 
+  private consumeValueToken(): Token | null {
+    if (this.check('STRING') || this.check('TAG') || this.check('PROPERTY')) {
+      return this.advance();
+    }
+    return null;
+  }
+
   private isAtEnd(): boolean {
     return this.tokens[this.current].type === 'EOF';
   }
@@ -257,6 +312,10 @@ export class SourceParser {
         return !this.evaluate(node.expr!, file);
       case 'TAG':
         return this.hasTag(file, node.value!);
+      case 'PROPERTY_EXISTS':
+        return this.hasProperty(file, node.property!);
+      case 'PROPERTY_EQUALS':
+        return this.propertyEquals(file, node.property!, node.value!);
       case 'STRING':
         return this.isPath(file, node.value!);
       case 'TRUE':
@@ -280,6 +339,53 @@ export class SourceParser {
       // getAllTags returns tags like "#tag", so we check exact match or sub-tag
       return t === searchTag || t.startsWith(searchTag + '/');
     });
+  }
+
+  private getFrontmatter(file: TFile): FrontMatterCache | null {
+    const cache = this.app.metadataCache.getFileCache(file);
+    return cache?.frontmatter ?? null;
+  }
+
+  private hasProperty(file: TFile, property: string): boolean {
+    const frontmatter = this.getFrontmatter(file);
+    if (!frontmatter) return false;
+
+    return Object.prototype.hasOwnProperty.call(frontmatter, property);
+  }
+
+  private propertyEquals(file: TFile, property: string, expectedValue: string): boolean {
+    const frontmatter = this.getFrontmatter(file);
+    if (!frontmatter || !Object.prototype.hasOwnProperty.call(frontmatter, property)) {
+      return false;
+    }
+
+    const actualValue = frontmatter[property];
+    return this.matchesFrontmatterValue(actualValue, expectedValue);
+  }
+
+  private matchesFrontmatterValue(actualValue: unknown, expectedValue: string): boolean {
+    if (actualValue == null) return false;
+
+    if (Array.isArray(actualValue)) {
+      return actualValue.some(value => this.matchesFrontmatterValue(value, expectedValue));
+    }
+
+    if (typeof actualValue === 'boolean') {
+      const normalized = expectedValue.toLowerCase();
+      if (normalized !== 'true' && normalized !== 'false') return false;
+      return actualValue === (normalized === 'true');
+    }
+
+    if (typeof actualValue === 'number') {
+      const expectedNumber = Number(expectedValue);
+      return Number.isFinite(expectedNumber) && actualValue === expectedNumber;
+    }
+
+    if (typeof actualValue === 'string') {
+      return actualValue === expectedValue;
+    }
+
+    return false;
   }
 
   private isPath(file: TFile, path: string): boolean {

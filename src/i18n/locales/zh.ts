@@ -284,10 +284,10 @@ export default {
         },
         columns: {
           heading: '列',
-          desc: '配置最近文件模块中显示的列。“来源”字段支持类 Dataview 查询。',
+          desc: '配置最近文件模块中显示的列。“来源”字段支持类 Dataview 查询，并支持 `.属性` / `.属性=值` 形式的 frontmatter 过滤。',
           placeholder: '列标题',
           sourceLabel: '来源查询:',
-          sourcePlaceholder: '例如 "Folder" AND #tag',
+          sourcePlaceholder: '例如 "Folder" AND #tag AND .status=active',
           templateLabel: 'Templater 模板路径:',
           templatePlaceholder:
             '留空表示仅新建空白笔记。如果指定路径(如: @tmp/notes.md)，则使用该模板来创建新笔记。',

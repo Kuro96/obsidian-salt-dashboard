@@ -290,10 +290,10 @@ export default {
         },
         columns: {
           heading: '列',
-          desc: "配置那些被展示在最近的锉刀模块里的列。'泉水'田野支持数据视图-喜欢的疑问。",
+          desc: "配置那些被展示在最近的锉刀模块里的列。'泉水'田野支持数据视图-喜欢的疑问，也支持 `.财产` / `.财产=值` 前物质过滤。",
           placeholder: '列头衔',
           sourceLabel: '泉水疑问:',
-          sourcePlaceholder: '例如 "文件夹" 和 #标签',
+          sourcePlaceholder: '例如 "文件夹" 和 #标签 和 .status=active',
           templateLabel: '模板者模板小径:',
           templatePlaceholder: '离开空白为了空的音符。例子: @临时/音符.md',
           addBtn: '+ 增加列',
