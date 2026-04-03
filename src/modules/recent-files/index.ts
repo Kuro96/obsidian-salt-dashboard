@@ -4,6 +4,7 @@ import { DashboardModule } from '../../app/architecture/DashboardModule';
 import { RecentFiles } from './components/RecentFiles';
 import { DEFAULT_SETTINGS } from '../../shared/constants';
 import { FileSuggest } from '../../shared/utils/FileSuggest';
+import { createHoverInfo } from '../../shared/utils/createHoverInfo';
 
 export const RecentFilesModule: DashboardModule = {
   id: 'recent-files',
@@ -74,6 +75,23 @@ export const RecentFilesModule: DashboardModule = {
       text: i18n.t('modules.settings.recentFiles.columns.desc'),
       cls: 'setting-item-description',
     }).style.marginBottom = '10px';
+
+    const syntaxHelpRow = containerEl.createDiv('sd-hover-info-row');
+    syntaxHelpRow.createSpan({
+      cls: 'setting-item-description',
+      text: i18n.t('modules.settings.recentFiles.columns.syntaxHelp.label'),
+    });
+    createHoverInfo(syntaxHelpRow, {
+      label: i18n.t('modules.settings.recentFiles.columns.syntaxHelp.ariaLabel'),
+      content: [
+        i18n.t('modules.settings.recentFiles.columns.syntaxHelp.intro'),
+        i18n.t('modules.settings.recentFiles.columns.syntaxHelp.examplePath'),
+        i18n.t('modules.settings.recentFiles.columns.syntaxHelp.exampleProperty'),
+        i18n.t('modules.settings.recentFiles.columns.syntaxHelp.examplePropertyValue'),
+        i18n.t('modules.settings.recentFiles.columns.syntaxHelp.exampleCombined'),
+      ],
+      iconText: 'i',
+    });
 
     const columnsContainer = containerEl.createDiv('recent-files-columns-container');
 

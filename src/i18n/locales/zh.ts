@@ -285,6 +285,16 @@ export default {
         columns: {
           heading: '列',
           desc: '配置最近文件模块中显示的列。“来源”字段支持类 Dataview 查询，并支持 `.属性` / `.属性=值` 形式的 frontmatter 过滤。',
+          syntaxHelp: {
+            label: '查询语法示例',
+            ariaLabel: '显示 recent files 查询语法帮助',
+            intro:
+              '支持路径、标签、AND / OR / NOT 逻辑运算，以及 `.属性` / `.属性=值` frontmatter 过滤。',
+            examplePath: '示例："Folder" AND #tag',
+            exampleProperty: '示例：.status',
+            examplePropertyValue: '示例：.status=active',
+            exampleCombined: '示例："Projects" AND #pinned AND .reviewed=true',
+          },
           placeholder: '列标题',
           sourceLabel: '来源查询:',
           sourcePlaceholder: '例如 "Folder" AND #tag AND .status=active',

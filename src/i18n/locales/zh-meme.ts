@@ -291,6 +291,16 @@ export default {
         columns: {
           heading: '列',
           desc: "配置那些被展示在最近的锉刀模块里的列。'泉水'田野支持数据视图-喜欢的疑问，也支持 `.财产` / `.财产=值` 前物质过滤。",
+          syntaxHelp: {
+            label: '疑问语法例子们',
+            ariaLabel: '展示最近的锉刀疑问语法帮助',
+            intro:
+              '支持小径、标签、AND / OR / NOT 逻辑操作员，也支持 `.财产` / `.财产=值` 前物质过滤。',
+            examplePath: '例子："文件夹" 和 #标签',
+            exampleProperty: '例子：.status',
+            examplePropertyValue: '例子：.status=active',
+            exampleCombined: '例子："Projects" 和 #pinned 和 .reviewed=true',
+          },
           placeholder: '列头衔',
           sourceLabel: '泉水疑问:',
           sourcePlaceholder: '例如 "文件夹" 和 #标签 和 .status=active',

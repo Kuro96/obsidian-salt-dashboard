@@ -315,6 +315,16 @@ export default {
         columns: {
           heading: 'Columns',
           desc: "Configure the columns displayed in the Recent Files module. The 'Source' field supports Dataview-like queries plus frontmatter filters such as `.property` and `.property=value`.",
+          syntaxHelp: {
+            label: 'Query syntax examples',
+            ariaLabel: 'Show recent files query syntax help',
+            intro:
+              'Supports paths, tags, AND / OR / NOT logic, plus frontmatter filters using `.property` and `.property=value`.',
+            examplePath: 'Example: "Folder" AND #tag',
+            exampleProperty: 'Example: .status',
+            examplePropertyValue: 'Example: .status=active',
+            exampleCombined: 'Example: "Projects" AND #pinned AND .reviewed=true',
+          },
           placeholder: 'Column Title',
           sourceLabel: 'Source Query:',
           sourcePlaceholder: 'e.g. "Folder" AND #tag AND .status=active',
