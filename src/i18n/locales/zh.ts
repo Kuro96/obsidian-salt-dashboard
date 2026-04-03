@@ -22,6 +22,33 @@ export default {
       globalFilter: {
         name: '全局过滤',
         desc: '应用于“最近文件”和“随机笔记”模块的过滤器。支持逻辑运算符（AND, OR, NOT）、标签（#tag）和字符串（"folder"）。',
+        syntaxHelp: {
+          label: '查询语法示例',
+          ariaLabel: '显示全局过滤查询语法帮助',
+          intro:
+            '支持路径、标签、AND / OR / NOT 逻辑运算，以及 `.属性` / `.属性=值` frontmatter 过滤。',
+          exampleExclude: '示例：(-"SCRIPTS") AND (-"TODO")',
+          exampleTag: '示例：#published',
+          exampleProperty: '示例：.status=active',
+          exampleCombined: '示例："notes" AND NOT #draft AND .reviewed=true',
+        },
+      },
+    },
+    todo: {
+      heading: 'TODO 通用',
+      sourceFolder: {
+        name: '待办事项源文件夹',
+        desc: '所有 TODO 模块读取文件的根文件夹。',
+      },
+      statsFile: {
+        name: '统计数据文件路径',
+        desc: '每日待办完成记录的 JSON 文件路径，由贡献图读取。',
+      },
+      weekStart: {
+        name: '一周起始日',
+        desc: '影响贡献图的周列显示方式。',
+        sunday: '周日',
+        monday: '周一',
       },
     },
     extensions: {
@@ -47,6 +74,12 @@ export default {
     },
     layout: {
       heading: '布局',
+      undo: {
+        name: '撤销布局重置',
+        desc: '恢复上次布局重置之前的布局。',
+        button: '撤销重置',
+        notice: '布局重置已撤销。',
+      },
       reset: {
         name: '重置布局',
         desc: '将所有模块的位置和宽度重置为默认值。',
@@ -64,7 +97,7 @@ export default {
       },
       restore: {
         name: '恢复初始设置',
-        desc: '将所有设置重置为默认值。关闭此选项卡后将无法撤销。',
+        desc: '将所有设置重置为默认值。可在本次会话内撤销，关闭设置面板后将无法恢复。',
         button: '恢复初始设置',
         confirm: '确定吗？点击确认',
         notice: '所有设置已恢复为默认值。',
@@ -283,7 +316,7 @@ export default {
           desc: '用于修改日期的 Frontmatter 属性。回退到文件修改时间。',
         },
         columns: {
-          heading: '列',
+          heading: '内容列',
           desc: '配置最近文件模块中显示的列。“来源”字段支持类 Dataview 查询，并支持 `.属性` / `.属性=值` 形式的 frontmatter 过滤。',
           syntaxHelp: {
             label: '查询语法示例',
@@ -308,7 +341,21 @@ export default {
       randomNote: {
         title: '随机笔记',
         heading: '随机笔记设置',
-        query: { name: '来源查询', desc: '随机笔记的过滤器。支持逻辑运算符。' },
+        query: {
+          name: '来源查询（覆盖全局过滤）',
+          desc: '留空则使用“全局过滤”设置。填写后将完全替代全局过滤，仅对随机笔记生效。支持逻辑运算符。',
+          placeholder: '留空使用全局过滤',
+          syntaxHelp: {
+            label: '查询语法示例',
+            ariaLabel: '显示随机笔记查询语法帮助',
+            intro:
+              '支持路径、标签、AND / OR / NOT 逻辑运算，以及 `.属性` / `.属性=值` frontmatter 过滤。',
+            exampleExclude: '示例：(-"SCRIPTS") AND (-"VIEWS")',
+            exampleTag: '示例：#published',
+            exampleProperty: '示例：.status=active',
+            exampleCombined: '示例："notes" AND NOT #draft AND .reviewed=true',
+          },
+        },
       },
       contributionGraph: {
         title: '贡献图',

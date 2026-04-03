@@ -6,10 +6,13 @@ import { registry } from '../registry/ModuleRegistry';
 import { LayoutManager } from '../services/LayoutManager';
 import { PluginLoader } from '../services/PluginLoader';
 import i18n from '../../i18n';
+import { createHoverInfo } from '../../shared/utils/createHoverInfo';
+import { FileSuggest } from '../../shared/utils/FileSuggest';
 
 export class HomepageSettingTab extends PluginSettingTab {
   plugin: HomepagePlugin;
   private backupSettings: HomepageSettings | null = null;
+  private layoutBackupSettings: HomepageSettings | null = null;
   private confirmingReset = false;
 
   constructor(app: App, plugin: HomepagePlugin) {
@@ -41,7 +44,6 @@ export class HomepageSettingTab extends PluginSettingTab {
             this.plugin.settings.language = value;
             await this.plugin.saveSettings();
 
-            // Reload i18n to take immediate effect if possible
             let newLng = value;
             if (value === 'system') {
               newLng = moment.locale();
@@ -52,7 +54,6 @@ export class HomepageSettingTab extends PluginSettingTab {
             }
             await i18n.changeLanguage(newLng);
 
-            // Re-render settings tab to reflect new language immediately
             this.display();
           });
       });
@@ -68,27 +69,78 @@ export class HomepageSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(i18n.t('settings.general.todoSource.name'))
-      .setDesc(i18n.t('settings.general.todoSource.desc'))
+      .setName(i18n.t('settings.general.globalFilter.name'))
+      .setDesc(i18n.t('settings.general.globalFilter.desc'))
       .addText(text =>
+        text
+          .setPlaceholder('(-"SCRIPTS") and (-"TODO")')
+          .setValue(this.plugin.settings.globalFilter)
+          .onChange(async value => {
+            this.plugin.settings.globalFilter = value;
+            await this.plugin.saveSettings();
+          })
+      )
+      .settingEl.addClass('sd-full-width-setting');
+
+    const filterHintRow = containerEl.createDiv('sd-hover-info-row');
+    filterHintRow.createSpan({
+      cls: 'setting-item-description',
+      text: i18n.t('settings.general.globalFilter.syntaxHelp.label'),
+    });
+    createHoverInfo(filterHintRow, {
+      label: i18n.t('settings.general.globalFilter.syntaxHelp.ariaLabel'),
+      content: [
+        i18n.t('settings.general.globalFilter.syntaxHelp.intro'),
+        i18n.t('settings.general.globalFilter.syntaxHelp.exampleExclude'),
+        i18n.t('settings.general.globalFilter.syntaxHelp.exampleTag'),
+        i18n.t('settings.general.globalFilter.syntaxHelp.exampleProperty'),
+        i18n.t('settings.general.globalFilter.syntaxHelp.exampleCombined'),
+      ],
+      iconText: 'i',
+    });
+
+    // --- TODO Common Settings ---
+    new Setting(containerEl).setHeading().setName(i18n.t('settings.todo.heading'));
+
+    new Setting(containerEl)
+      .setName(i18n.t('settings.todo.sourceFolder.name'))
+      .setDesc(i18n.t('settings.todo.sourceFolder.desc'))
+      .addText(text => {
         text
           .setPlaceholder('TODO')
           .setValue(this.plugin.settings.todoSourceFolder)
           .onChange(async value => {
             this.plugin.settings.todoSourceFolder = value;
             await this.plugin.saveSettings();
-          })
-      );
+          });
+        new FileSuggest(this.app, text.inputEl, { mode: 'folder' });
+      });
 
     new Setting(containerEl)
-      .setName(i18n.t('settings.general.globalFilter.name'))
-      .setDesc(i18n.t('settings.general.globalFilter.desc'))
-      .addTextArea(text =>
+      .setName(i18n.t('settings.todo.statsFile.name'))
+      .setDesc(i18n.t('settings.todo.statsFile.desc'))
+      .addText(text => {
         text
-          .setPlaceholder('(-"SCRIPTS") and (-"TODO")')
-          .setValue(this.plugin.settings.globalFilter)
+          .setPlaceholder('SCRIPTS/data/daily_stats.json')
+          .setValue(this.plugin.settings.todoStatsFile)
           .onChange(async value => {
-            this.plugin.settings.globalFilter = value;
+            this.plugin.settings.todoStatsFile = value;
+            await this.plugin.saveSettings();
+          });
+        new FileSuggest(this.app, text.inputEl, { extensions: ['json'] });
+      })
+      .settingEl.addClass('sd-full-width-setting');
+
+    new Setting(containerEl)
+      .setName(i18n.t('settings.todo.weekStart.name'))
+      .setDesc(i18n.t('settings.todo.weekStart.desc'))
+      .addDropdown(dropdown =>
+        dropdown
+          .addOption('0', i18n.t('settings.todo.weekStart.sunday'))
+          .addOption('1', i18n.t('settings.todo.weekStart.monday'))
+          .setValue(String(this.plugin.settings.weekStart ?? 0))
+          .onChange(async value => {
+            this.plugin.settings.weekStart = Number(value);
             await this.plugin.saveSettings();
           })
       );
@@ -99,17 +151,17 @@ export class HomepageSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName(i18n.t('settings.extensions.customPluginFolder.name'))
       .setDesc(i18n.t('settings.extensions.customPluginFolder.desc'))
-      .addText(text =>
+      .addText(text => {
         text.setValue(this.plugin.settings.customPluginFolder).onChange(async value => {
           this.plugin.settings.customPluginFolder = value;
           await this.plugin.saveSettings();
-        })
-      )
+        });
+        new FileSuggest(this.app, text.inputEl, { mode: 'folder' });
+      })
       .addButton(btn =>
         btn.setButtonText(i18n.t('settings.extensions.buttons.reload')).onClick(async () => {
           const loader = new PluginLoader(this.app, this.plugin.settings);
           await loader.reload();
-          // Refresh settings view to show new modules
           this.display();
         })
       )
@@ -129,7 +181,8 @@ export class HomepageSettingTab extends PluginSettingTab {
               new Notice(i18n.t('settings.extensions.notices.noOrphaned'));
             }
           })
-      );
+      )
+      .settingEl.addClass('sd-full-width-setting');
 
     // --- Active Modules Management ---
     new Setting(containerEl).setHeading().setName(i18n.t('settings.activeModules.heading'));
@@ -137,11 +190,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 
     const activeModulesContainer = containerEl.createDiv('active-modules-container');
 
-    // Get all registered modules
     const allRegistered = registry.getAllModules();
 
     allRegistered.forEach(mod => {
-      // Find current state in layout
       const layoutItem = this.plugin.settings.layout.modules.find(m => m.id === mod.id);
       const isEnabled = layoutItem ? layoutItem.enabled : false;
 
@@ -150,36 +201,25 @@ export class HomepageSettingTab extends PluginSettingTab {
         .setDesc(mod.id)
         .addToggle(toggle =>
           toggle.setValue(isEnabled).onChange(async val => {
-            // Use LayoutManager to toggle
             const success = LayoutManager.toggleModule(this.plugin.settings, mod.id, val);
 
             if (!success) {
-              // Edge case: Module registered but not in layout (shouldn't happen due to sync)
-              // Force a sync then toggle
               LayoutManager.syncLayout(this.plugin.settings);
               LayoutManager.toggleModule(this.plugin.settings, mod.id, val);
             }
 
-            // Sync to Contribution Graph Settings for Todo Modules
-            if (!val) {
-              // Only auto-disable
-              if (mod.id === 'daily-todo')
-                this.plugin.settings.contributionGraph.enableDailyTodo = false;
-              if (mod.id === 'regular-todo')
-                this.plugin.settings.contributionGraph.enableRegularTodo = false;
-              if (mod.id === 'jottings-todo')
-                this.plugin.settings.contributionGraph.enableJottingsTodo = false;
-            } else {
-              // Optional: Auto-enable? User asked for "When ... not enabled... directly disable"
-              // It's safer not to auto-enable, but for better UX, maybe we should?
-              // Let's stick to strict requirement: "When ... not enabled... directly disable"
-              // But wait, if I enable "Daily Todo" module, I probably expect it to show up in graph if it was previously enabled.
-              // However, checking the requirement again: "When a todo module is disabled... disable corresponding todo".
-              // It doesn't say "When enabled... enable".
+            // Bidirectional sync with ContributionGraph data source toggles
+            if (mod.id === 'daily-todo') {
+              this.plugin.settings.contributionGraph.enableDailyTodo = val;
+            }
+            if (mod.id === 'regular-todo') {
+              this.plugin.settings.contributionGraph.enableRegularTodo = val;
+            }
+            if (mod.id === 'jottings-todo') {
+              this.plugin.settings.contributionGraph.enableJottingsTodo = val;
             }
 
             await this.plugin.saveSettings();
-            // Refresh display to update module settings visibility
             this.display();
           })
         );
@@ -188,9 +228,8 @@ export class HomepageSettingTab extends PluginSettingTab {
     // --- Dynamic Module Settings ---
     const modules = registry.getAllModules();
     modules.forEach(module => {
-      // Check if module is enabled in layout
       const layoutItem = this.plugin.settings.layout.modules.find(m => m.id === module.id);
-      if (layoutItem && !layoutItem.enabled) return; // Skip rendering settings if disabled
+      if (layoutItem && !layoutItem.enabled) return;
 
       try {
         module.renderSettings(containerEl, this.plugin, this.plugin.settings);
@@ -205,6 +244,28 @@ export class HomepageSettingTab extends PluginSettingTab {
     // --- Layout ---
     new Setting(containerEl).setHeading().setName(i18n.t('settings.layout.heading'));
 
+    if (this.layoutBackupSettings) {
+      new Setting(containerEl)
+        .setName(i18n.t('settings.layout.undo.name'))
+        .setDesc(i18n.t('settings.layout.undo.desc'))
+        .addButton(btn =>
+          btn
+            .setButtonText(i18n.t('settings.layout.undo.button'))
+            .setCta()
+            .onClick(async () => {
+              if (this.layoutBackupSettings) {
+                this.plugin.settings.layout = JSON.parse(
+                  JSON.stringify(this.layoutBackupSettings.layout)
+                );
+                this.layoutBackupSettings = null;
+                await this.plugin.saveSettings();
+                new Notice(i18n.t('settings.layout.undo.notice'));
+                this.display();
+              }
+            })
+        );
+    }
+
     new Setting(containerEl)
       .setName(i18n.t('settings.layout.reset.name'))
       .setDesc(i18n.t('settings.layout.reset.desc'))
@@ -213,9 +274,11 @@ export class HomepageSettingTab extends PluginSettingTab {
           .setButtonText(i18n.t('settings.layout.reset.button'))
           .setWarning()
           .onClick(async () => {
+            this.layoutBackupSettings = JSON.parse(JSON.stringify(this.plugin.settings));
             this.plugin.settings.layout = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.layout));
             await this.plugin.saveSettings();
             new Notice(i18n.t('settings.layout.reset.notice'));
+            this.display();
           })
       );
 
@@ -229,14 +292,14 @@ export class HomepageSettingTab extends PluginSettingTab {
         .addButton(btn =>
           btn
             .setButtonText(i18n.t('settings.dangerZone.undo.button'))
-            .setCta() // Call to action style
+            .setCta()
             .onClick(async () => {
               if (this.backupSettings) {
                 this.plugin.settings = JSON.parse(JSON.stringify(this.backupSettings));
                 this.backupSettings = null;
                 await this.plugin.saveSettings();
                 new Notice(i18n.t('settings.dangerZone.undo.notice'));
-                this.display(); // Refresh to hide Undo button
+                this.display();
               }
             })
         );
@@ -257,7 +320,6 @@ export class HomepageSettingTab extends PluginSettingTab {
             if (!this.confirmingReset) {
               this.confirmingReset = true;
               btn.setButtonText(i18n.t('settings.dangerZone.restore.confirm'));
-              // Optional: Reset confirmation after 5 seconds
               setTimeout(() => {
                 if (this.confirmingReset) {
                   this.confirmingReset = false;
@@ -265,10 +327,8 @@ export class HomepageSettingTab extends PluginSettingTab {
                 }
               }, 5000);
             } else {
-              // Execute Reset
               this.backupSettings = JSON.parse(JSON.stringify(this.plugin.settings));
 
-              // Reset to merged defaults (core + modules)
               const moduleDefaults = registry.getAllDefaultSettings();
               this.plugin.settings = Object.assign({}, DEFAULT_SETTINGS, moduleDefaults);
 
@@ -276,7 +336,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 
               this.confirmingReset = false;
               new Notice(i18n.t('settings.dangerZone.restore.notice'));
-              this.display(); // Refresh to show Undo button and update fields
+              this.display();
             }
           })
       );

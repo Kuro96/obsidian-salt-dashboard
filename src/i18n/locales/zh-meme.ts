@@ -22,6 +22,32 @@ export default {
       globalFilter: {
         name: '全球过滤器',
         desc: '过滤器被申请到最近的锉刀们和随机的音符模块们。支持逻辑操作员们（和，或，不），标签们（#标签），以及细绳们（"文件夹"）。',
+        syntaxHelp: {
+          label: '疑问语法例子们',
+          ariaLabel: '展示全球过滤器疑问语法帮助',
+          intro: '支持小径们，标签们，和 / 或 / 非逻辑，以及 `.财产` / `.财产=值` 前物质过滤。',
+          exampleExclude: '例子：(-"脚本") AND (-"去做")',
+          exampleTag: '例子：#被发表的',
+          exampleProperty: '例子：.状态=活跃的',
+          exampleCombined: '例子："音符" AND NOT #草稿 AND .被回顾的=真的',
+        },
+      },
+    },
+    todo: {
+      heading: '去做公共的',
+      sourceFolder: {
+        name: '去做泉水文件夹',
+        desc: '根文件夹在哪里所有去做模块们阅读他们的锉刀们。',
+      },
+      statsFile: {
+        name: '统计锉刀小径',
+        desc: '小径到JSON锉刀存储日常去做完成记录们，被捐赠图表阅读。',
+      },
+      weekStart: {
+        name: '一周开始日',
+        desc: '影响怎样周列们被展示在捐赠图表里。',
+        sunday: '星期日',
+        monday: '星期一',
       },
     },
     extensions: {
@@ -47,6 +73,12 @@ export default {
     },
     layout: {
       heading: '布局',
+      undo: {
+        name: '解做布局重置',
+        desc: '恢复布局从在最后一次重置之前。',
+        button: '解做重置',
+        notice: '布局重置被解做了。',
+      },
       reset: {
         name: '重置布局',
         desc: '重置所有模块位置和宽度们去违约。',
@@ -64,7 +96,7 @@ export default {
       },
       restore: {
         name: '恢复最初的设定集',
-        desc: '重置所有设定集去违约价值们。这不能被解做在你关闭这个标签之后。',
+        desc: '重置所有设定集去违约价值们。能够被解做在这个会话里；关闭设定集面板使它永久的。',
         button: '恢复最初的设定集',
         confirm: '你确定吗？点击去确认',
         notice: '所有的设定集恢复去违约了。',
@@ -289,7 +321,7 @@ export default {
           desc: '前物质财产为了修改枣子。摔倒回到锉刀修改时间。',
         },
         columns: {
-          heading: '列',
+          heading: '内容列们',
           desc: "配置那些被展示在最近的锉刀模块里的列。'泉水'田野支持数据视图-喜欢的疑问，也支持 `.财产` / `.财产=值` 前物质过滤。",
           syntaxHelp: {
             label: '疑问语法例子们',
@@ -314,8 +346,18 @@ export default {
         title: '随机的音符',
         heading: '随机的音符设定集',
         query: {
-          name: '泉水疑问',
-          desc: '过滤器为了随机的音符。支持逻辑操作员们。',
+          name: '泉水疑问（覆盖全球过滤器）',
+          desc: '离开空的然后使用全球过滤器设定。当被填写的时候，这完全地替换全球过滤器为了随机的音符只有。支持逻辑操作员们。',
+          placeholder: '离开空的去使用全球过滤器',
+          syntaxHelp: {
+            label: '疑问语法例子们',
+            ariaLabel: '展示随机的音符疑问语法帮助',
+            intro: '支持小径们，标签们，和 / 或 / 非逻辑，以及 `.财产` / `.财产=值` 前物质过滤。',
+            exampleExclude: '例子：(-"脚本") AND (-"视图")',
+            exampleTag: '例子：#被发表的',
+            exampleProperty: '例子：.状态=活跃的',
+            exampleCombined: '例子："音符" AND NOT #草稿 AND .被回顾的=真的',
+          },
         },
       },
       contributionGraph: {

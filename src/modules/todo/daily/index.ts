@@ -25,19 +25,6 @@ export const DailyTodoModule: DashboardModule = {
       );
 
     new Setting(containerEl)
-      .setName(i18n.t('modules.settings.dailyTodo.statsFile.name'))
-      .setDesc(i18n.t('modules.settings.dailyTodo.statsFile.desc'))
-      .addText(text =>
-        text
-          .setPlaceholder('SCRIPTS/data/daily_stats.json')
-          .setValue(settings.dailyTodo.statsFile || 'SCRIPTS/data/daily_stats.json')
-          .onChange(async value => {
-            settings.dailyTodo.statsFile = value;
-            await (plugin as any).saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
       .setName(i18n.t('modules.settings.dailyTodo.crontab.name'))
       .setDesc(i18n.t('modules.settings.dailyTodo.crontab.desc'))
       .addToggle(toggle =>

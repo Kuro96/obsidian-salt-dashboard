@@ -291,3 +291,17 @@
 .sd-hover-info__line + .sd-hover-info__line {
   margin-top: 6px;
 }
+
+/* Full-width setting: control wraps below name/description */
+.sd-full-width-setting {
+  flex-wrap: wrap;
+}
+.sd-full-width-setting .setting-item-control {
+  flex: 0 0 100%;
+  padding-top: 4px;
+}
+.sd-full-width-setting .setting-item-control input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}

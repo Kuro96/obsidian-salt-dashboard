@@ -22,6 +22,33 @@ export default {
       globalFilter: {
         name: 'Global Filter',
         desc: 'Filter applied to Recent Files and Random Note modules. Supports logical operators (AND, OR, NOT), tags (#tag), and strings ("folder").',
+        syntaxHelp: {
+          label: 'Query syntax examples',
+          ariaLabel: 'Show global filter query syntax help',
+          intro:
+            'Supports paths, tags, AND / OR / NOT logic, and `.property` / `.property=value` frontmatter filters.',
+          exampleExclude: 'Example: (-"SCRIPTS") AND (-"TODO")',
+          exampleTag: 'Example: #published',
+          exampleProperty: 'Example: .status=active',
+          exampleCombined: 'Example: "notes" AND NOT #draft AND .reviewed=true',
+        },
+      },
+    },
+    todo: {
+      heading: 'TODO Common',
+      sourceFolder: {
+        name: 'TODO Source Folder',
+        desc: 'Root folder where all TODO modules read their files from.',
+      },
+      statsFile: {
+        name: 'Stats File Path',
+        desc: 'Path to the JSON file storing Daily Todo completion records, read by the Contribution Graph.',
+      },
+      weekStart: {
+        name: 'Week Start Day',
+        desc: 'Affects how week columns are displayed in the Contribution Graph.',
+        sunday: 'Sunday',
+        monday: 'Monday',
       },
     },
     extensions: {
@@ -47,6 +74,12 @@ export default {
     },
     layout: {
       heading: 'Layout',
+      undo: {
+        name: 'Undo Layout Reset',
+        desc: 'Restore the layout from before the last reset.',
+        button: 'Undo Reset',
+        notice: 'Layout reset undone.',
+      },
       reset: {
         name: 'Reset Layout',
         desc: 'Reset all module positions and widths to default.',
@@ -64,7 +97,7 @@ export default {
       },
       restore: {
         name: 'Restore Initial Settings',
-        desc: 'Reset ALL settings to default values. This cannot be undone after you close this tab.',
+        desc: 'Reset ALL settings to default values. Can be undone within this session; closing the settings panel makes it permanent.',
         button: 'Restore Initial Settings',
         confirm: 'Are you sure? Click to confirm',
         notice: 'All settings restored to default.',
@@ -313,7 +346,7 @@ export default {
           desc: 'Frontmatter property for modification date. Falls back to file modification time.',
         },
         columns: {
-          heading: 'Columns',
+          heading: 'Content Columns',
           desc: "Configure the columns displayed in the Recent Files module. The 'Source' field supports Dataview-like queries plus frontmatter filters such as `.property` and `.property=value`.",
           syntaxHelp: {
             label: 'Query syntax examples',
@@ -338,8 +371,19 @@ export default {
         title: 'Random Note',
         heading: 'Random Note Settings',
         query: {
-          name: 'Source Query',
-          desc: 'Filter for random notes. Supports logical operators.',
+          name: 'Source Query (Override Global Filter)',
+          desc: 'Leave empty to use the Global Filter setting. When filled, this completely replaces the global filter for random notes only. Supports logical operators.',
+          placeholder: 'Leave empty to use Global Filter',
+          syntaxHelp: {
+            label: 'Query syntax examples',
+            ariaLabel: 'Show random note query syntax help',
+            intro:
+              'Supports paths, tags, AND / OR / NOT logic, and `.property` / `.property=value` frontmatter filters.',
+            exampleExclude: 'Example: (-"SCRIPTS") AND (-"VIEWS")',
+            exampleTag: 'Example: #published',
+            exampleProperty: 'Example: .status=active',
+            exampleCombined: 'Example: "notes" AND NOT #draft AND .reviewed=true',
+          },
         },
       },
       contributionGraph: {

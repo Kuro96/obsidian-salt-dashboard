@@ -18,12 +18,13 @@ export const JottingsTodoModule: DashboardModule = {
     new Setting(containerEl)
       .setName(i18n.t('modules.settings.jottingsTodo.folder.name'))
       .setDesc(i18n.t('modules.settings.jottingsTodo.folder.desc'))
-      .addText(text =>
+      .addText(text => {
         text.setValue(settings.jottingsTodo.jottingsFolder).onChange(async value => {
           settings.jottingsTodo.jottingsFolder = value;
           await (plugin as any).saveSettings();
-        })
-      );
+        });
+        new FileSuggest(plugin.app, text.inputEl, { mode: 'folder' });
+      });
 
     new Setting(containerEl)
       .setName(i18n.t('modules.settings.jottingsTodo.pathPattern.name'))
@@ -35,7 +36,8 @@ export const JottingsTodoModule: DashboardModule = {
             settings.jottingsTodo.jottingsPathPattern = value;
             await (plugin as any).saveSettings();
           })
-      );
+      )
+      .settingEl.addClass('sd-full-width-setting');
 
     new Setting(containerEl)
       .setName(i18n.t('modules.settings.jottingsTodo.template.name'))
@@ -46,7 +48,8 @@ export const JottingsTodoModule: DashboardModule = {
           await (plugin as any).saveSettings();
         });
         new FileSuggest(plugin.app, text.inputEl);
-      });
+      })
+      .settingEl.addClass('sd-full-width-setting');
 
     new Setting(containerEl)
       .setName(i18n.t('modules.settings.jottingsTodo.showPinButton.name'))

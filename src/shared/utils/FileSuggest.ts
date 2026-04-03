@@ -1,5 +1,12 @@
 import { createPopper, type Instance as PopperInstance } from '@popperjs/core';
-import { App, type ISuggestOwner, Scope, TAbstractFile } from 'obsidian';
+import { App, type ISuggestOwner, Scope, TAbstractFile, TFolder } from 'obsidian';
+
+export type SuggestMode = 'file' | 'folder';
+
+export interface SuggestOptions {
+  mode?: SuggestMode;
+  extensions?: string[]; // only applies when mode='file', defaults to ['md']
+}
 
 export const wrapAround = (value: number, size: number): number => {
   return ((value % size) + size) % size;
@@ -176,18 +183,29 @@ export abstract class TextInputSuggest<T> implements ISuggestOwner<T> {
 }
 
 export class FileSuggest extends TextInputSuggest<TAbstractFile> {
+  private mode: SuggestMode;
+  private extensions: string[];
+
+  constructor(app: App, inputEl: HTMLInputElement, options: SuggestOptions = {}) {
+    super(app, inputEl);
+    this.mode = options.mode ?? 'file';
+    this.extensions = options.extensions ?? ['md'];
+  }
+
   getSuggestions(inputStr: string): TAbstractFile[] {
-    const abstractFiles = this.app.vault.getFiles();
-    const paths: TAbstractFile[] = [];
-    const lowerCaseInputStr = inputStr.toLowerCase();
-
-    abstractFiles.forEach((file: TAbstractFile) => {
-      if (file.path.toLowerCase().contains(lowerCaseInputStr) && (file as any).extension === 'md') {
-        paths.push(file);
-      }
-    });
-
-    return paths;
+    const lowerInput = inputStr.toLowerCase();
+    if (this.mode === 'folder') {
+      return this.app.vault
+        .getAllLoadedFiles()
+        .filter(f => f instanceof TFolder && f.path.toLowerCase().contains(lowerInput));
+    }
+    return this.app.vault
+      .getFiles()
+      .filter(
+        f =>
+          f.path.toLowerCase().contains(lowerInput) &&
+          this.extensions.includes((f as any).extension)
+      );
   }
 
   renderSuggestion(file: TAbstractFile, el: HTMLElement): void {

@@ -14,9 +14,10 @@ export const useDailyTodo = () => {
     const config = {
       ...settings.dailyTodo,
       todoSourceFolder: settings.todoSourceFolder,
+      statsFile: settings.todoStatsFile,
     };
     return new DailyTodoService(app, config);
-  }, [app, settings.dailyTodo, settings.todoSourceFolder]);
+  }, [app, settings.dailyTodo, settings.todoSourceFolder, settings.todoStatsFile]);
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);

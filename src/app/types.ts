@@ -67,6 +67,7 @@ export interface ModuleConfig {
 export interface TodoModuleConfig extends ModuleConfig {
   maxItems?: number; // 最大显示任务数
   todoSourceFolder?: string; // 源文件夹路径 (from global settings)
+  statsFile?: string; // 统计数据文件路径 (from global settings, injected at runtime)
   templatePath?: string; // Templater 模板路径 (optional)
   jottingsFolder?: string; // jottings 文件夹路径 (optional)
   statusFilters?: string[]; // 状态过滤 (NEW)
@@ -80,7 +81,6 @@ export interface TodoModuleConfig extends ModuleConfig {
 // Daily TODO 配置
 export interface DailyTodoConfig extends TodoModuleConfig {
   dailyFileName: string; // 日常任务文件名
-  statsFile: string; // 状态存储文件路径
   enableCrontab: boolean; // 是否启用 crontab 语法
 }
 
@@ -102,9 +102,6 @@ export interface JottingsTodoConfig extends TodoModuleConfig {
 
 // ContributionGraph 配置
 export interface ContributionGraphConfig extends ModuleConfig {
-  dataSource: string; // DailyTodo 数据文件路径
-  historicDataSource: string; // 归档数据文件路径
-  weekStart: number; // 一周起始日
   tooltipEnabled: boolean; // 是否启用悬停提示
   enableDailyTodo: boolean; // 是否启用 DailyTodo 数据源
   enableRegularTodo: boolean; // 是否启用 RegularTodo 数据源
@@ -114,7 +111,6 @@ export interface ContributionGraphConfig extends ModuleConfig {
 // DateProgress 配置
 export interface DateProgressConfig extends ModuleConfig {
   dateFormat: string; // 日期格式
-  weekStart: number; // 一周起始日
   showStats: boolean; // 是否显示笔记统计
   excludeFolders: string[]; // 统计排除文件夹
 }
@@ -153,10 +149,14 @@ export interface TmpNoteConfig extends ModuleConfig {
 export interface HomepageSettings {
   // 通用设置
   openOnStartup: boolean; // 启动时自动打开
-  todoSourceFolder: string; // TODO 模块统一数据源文件夹
   globalFilter: string; // 全局过滤器 (Applied to Recent Files & Random Note)
   customPluginFolder: string; // 自定义插件文件夹路径
   language: string; // 语言设置 ('system', 'en', 'zh', 'zh-meme')
+
+  // TODO 通用设置
+  todoSourceFolder: string; // TODO 模块统一数据源文件夹
+  todoStatsFile: string; // 任务统计数据 JSON 文件路径
+  weekStart: number; // 一周起始日 (0=周日, 1=周一)
 
   // 布局配置
   layout: LayoutConfig; // 布局系统配置

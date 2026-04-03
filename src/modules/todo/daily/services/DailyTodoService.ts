@@ -12,7 +12,10 @@ export class DailyTodoService extends TodoBaseService {
   constructor(app: App, config: DailyTodoConfig) {
     super(app, config);
     this.config = config;
-    this.statsManager = new DailyStatsManager(app, config.statsFile);
+    this.statsManager = new DailyStatsManager(
+      app,
+      config.statsFile || 'SCRIPTS/data/daily_stats.json'
+    );
   }
 
   protected async fetchRawTasks(date?: string): Promise<Task[]> {

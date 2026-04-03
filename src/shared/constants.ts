@@ -5,10 +5,14 @@ export const VIEW_TYPE_HOMEPAGE = 'homepage-dashboard-view';
 export const DEFAULT_SETTINGS: HomepageSettings = {
   // 通用设置
   openOnStartup: false,
-  todoSourceFolder: 'TODO',
   globalFilter: '(-"SCRIPTS") and (-"TODO")',
   customPluginFolder: 'SCRIPTS/dashboard-plugins',
   language: 'system',
+
+  // TODO 通用设置
+  todoSourceFolder: 'TODO',
+  todoStatsFile: 'SCRIPTS/data/daily_stats.json',
+  weekStart: 0,
 
   // 布局配置
   layout: {
@@ -101,16 +105,12 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
   // 日期进度
   dateProgress: {
     dateFormat: 'YYYY-MM-DD',
-    weekStart: 0,
     showStats: true,
     excludeFolders: ['SCRIPTS', 'TODO', 'VIEWS'],
   },
 
   // 活跃度图
   contributionGraph: {
-    dataSource: 'SCRIPTS/data/daily_stats.json',
-    historicDataSource: 'SCRIPTS/data/daily_stats_historic.json',
-    weekStart: 0,
     tooltipEnabled: true,
     enableDailyTodo: true,
     enableRegularTodo: true,
@@ -120,7 +120,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
   // Daily TODO
   dailyTodo: {
     dailyFileName: 'daily.md',
-    statsFile: 'SCRIPTS/data/daily_stats.json',
     maxItems: 10,
     enableCrontab: true,
     showPinButton: true,

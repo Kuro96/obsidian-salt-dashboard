@@ -13,7 +13,7 @@ export class ContributionGraphService {
     this.app = app;
     this.settings = settings;
     this.config = settings.contributionGraph;
-    this.dailyStatsManager = new DailyStatsManager(app, settings.dailyTodo.statsFile);
+    this.dailyStatsManager = new DailyStatsManager(app, settings.todoStatsFile);
   }
 
   async getYearData(): Promise<Map<string, number>> {

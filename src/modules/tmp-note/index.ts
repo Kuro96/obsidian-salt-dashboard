@@ -3,6 +3,7 @@ import i18n from '../../i18n';
 import { DashboardModule } from '../../app/architecture/DashboardModule';
 import { TmpNote } from './components/TmpNote';
 import { DEFAULT_SETTINGS } from '../../shared/constants';
+import { FileSuggest } from '../../shared/utils/FileSuggest';
 
 export const TmpNoteModule: DashboardModule = {
   id: 'tmp-note',
@@ -17,11 +18,13 @@ export const TmpNoteModule: DashboardModule = {
     new Setting(containerEl)
       .setName(i18n.t('modules.settings.tmpNote.path.name'))
       .setDesc(i18n.t('modules.settings.tmpNote.path.desc'))
-      .addText(text =>
+      .addText(text => {
         text.setValue(settings.tmpNote.tmpNotePath).onChange(async value => {
           settings.tmpNote.tmpNotePath = value;
           await (plugin as any).saveSettings();
-        })
-      );
+        });
+        new FileSuggest((plugin as any).app, text.inputEl);
+      })
+      .settingEl.addClass('sd-full-width-setting');
   },
 };
