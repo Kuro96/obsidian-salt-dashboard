@@ -215,3 +215,79 @@
   transform: scale(1.1);
 }
 
+/* Shared Settings Hover Info */
+.sd-hover-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -2px 0 10px;
+}
+
+.sd-hover-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.sd-hover-info__trigger {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background: var(--background-primary-alt, var(--background-primary));
+  color: var(--text-muted);
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sd-hover-info__trigger:hover,
+.sd-hover-info__trigger:focus-visible {
+  color: var(--text-normal);
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.sd-hover-info__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 260px;
+  max-width: min(360px, calc(100vw - 48px));
+  padding: 10px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-primary);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  color: var(--text-normal);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  z-index: 200;
+}
+
+.sd-hover-info:hover .sd-hover-info__panel,
+.sd-hover-info:focus-within .sd-hover-info__panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.sd-hover-info__line {
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: normal;
+}
+
+.sd-hover-info__line + .sd-hover-info__line {
+  margin-top: 6px;
+}
