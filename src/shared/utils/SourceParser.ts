@@ -7,14 +7,15 @@ type TokenType =
   | 'LPAREN'
   | 'RPAREN'
   | 'TAG'
-  | 'PROPERTY'
-  | 'EQUALS'
+  | 'BRACKET_FILTER'
   | 'STRING'
   | 'EOF';
 
 interface Token {
   type: TokenType;
   value?: string;
+  property?: string; // for BRACKET_FILTER
+  valueExpr?: string | null; // for BRACKET_FILTER: null = no colon clause
 }
 
 interface ASTNode {
@@ -24,12 +25,239 @@ interface ASTNode {
   expr?: ASTNode;
   value?: string;
   property?: string;
+  valueExpr?: string;
 }
+
+// ── Value sub-expression matcher ──────────────────────────────────────────────
+// Used to evaluate the expression inside [property:expr].
+// Supports: OR / AND / NOT / () / unquoted words / "quoted" / /regex/flags
+
+type VTokenType = 'AND' | 'OR' | 'NOT' | 'LPAREN' | 'RPAREN' | 'WORD' | 'REGEX' | 'EOF';
+
+interface VToken {
+  type: VTokenType;
+  value?: string; // for WORD
+  exact?: boolean; // true = quoted → exact match; false = case-insensitive
+  pattern?: string; // for REGEX
+  flags?: string; // for REGEX
+}
+
+interface VNode {
+  type: string;
+  left?: VNode;
+  right?: VNode;
+  expr?: VNode;
+  value?: string;
+  exact?: boolean;
+  pattern?: string;
+  flags?: string;
+}
+
+class ValueMatcher {
+  private tokens: VToken[] = [];
+  private pos = 0;
+
+  test(expr: string, actualValue: unknown): boolean {
+    try {
+      this.tokens = this.tokenize(expr);
+      this.pos = 0;
+      const ast = this.expression();
+      return this.evaluate(ast, actualValue);
+    } catch {
+      return false;
+    }
+  }
+
+  private tokenize(expr: string): VToken[] {
+    const tokens: VToken[] = [];
+    let i = 0;
+
+    while (i < expr.length) {
+      const c = expr[i];
+
+      if (/\s/.test(c)) {
+        i++;
+        continue;
+      }
+      if (c === '(') {
+        tokens.push({ type: 'LPAREN' });
+        i++;
+        continue;
+      }
+      if (c === ')') {
+        tokens.push({ type: 'RPAREN' });
+        i++;
+        continue;
+      }
+
+      if (c === '!' || (c === '-' && (i + 1 >= expr.length || /[\s("'/]/.test(expr[i + 1])))) {
+        tokens.push({ type: 'NOT' });
+        i++;
+        continue;
+      }
+
+      // Quoted string → exact match
+      if (c === '"' || c === "'") {
+        const q = c;
+        let val = '';
+        i++;
+        while (i < expr.length && expr[i] !== q) {
+          if (expr[i] === '\\' && i + 1 < expr.length) {
+            val += expr[i + 1];
+            i += 2;
+          } else {
+            val += expr[i];
+            i++;
+          }
+        }
+        if (i < expr.length) i++; // closing quote
+        tokens.push({ type: 'WORD', value: val, exact: true });
+        continue;
+      }
+
+      // Regex: /pattern/flags
+      if (c === '/') {
+        let pattern = '';
+        i++;
+        while (i < expr.length && expr[i] !== '/') {
+          if (expr[i] === '\\' && i + 1 < expr.length) {
+            pattern += expr[i] + expr[i + 1];
+            i += 2;
+          } else {
+            pattern += expr[i];
+            i++;
+          }
+        }
+        if (i < expr.length) i++; // closing /
+        let flags = '';
+        while (i < expr.length && /[gimsuy]/.test(expr[i])) {
+          flags += expr[i];
+          i++;
+        }
+        tokens.push({ type: 'REGEX', pattern, flags });
+        continue;
+      }
+
+      // Unquoted word → case-insensitive exact match
+      if (/\S/.test(c)) {
+        let val = '';
+        while (i < expr.length && !/[\s()]/.test(expr[i])) {
+          val += expr[i];
+          i++;
+        }
+        const lower = val.toLowerCase();
+        if (lower === 'and') tokens.push({ type: 'AND' });
+        else if (lower === 'or') tokens.push({ type: 'OR' });
+        else if (lower === 'not') tokens.push({ type: 'NOT' });
+        else tokens.push({ type: 'WORD', value: val, exact: false });
+        continue;
+      }
+
+      i++;
+    }
+
+    tokens.push({ type: 'EOF' });
+    return tokens;
+  }
+
+  private expression(): VNode {
+    return this.or();
+  }
+
+  private or(): VNode {
+    let node = this.and();
+    while (this.match('OR')) node = { type: 'OR', left: node, right: this.and() };
+    return node;
+  }
+
+  private and(): VNode {
+    let node = this.unary();
+    while (this.match('AND')) node = { type: 'AND', left: node, right: this.unary() };
+    return node;
+  }
+
+  private unary(): VNode {
+    if (this.match('NOT')) return { type: 'NOT', expr: this.unary() };
+    return this.primary();
+  }
+
+  private primary(): VNode {
+    if (this.match('LPAREN')) {
+      const node = this.expression();
+      this.consume('RPAREN');
+      return node;
+    }
+    if (this.check('WORD') || this.check('REGEX')) {
+      const t = this.advance();
+      return t as VNode;
+    }
+    if (!this.isAtEnd()) this.advance();
+    return { type: 'TRUE' };
+  }
+
+  private evaluate(node: VNode, actual: unknown): boolean {
+    // For array values, any element satisfying the whole expression counts
+    if (Array.isArray(actual)) {
+      return actual.some(v => this.evaluate(node, v));
+    }
+
+    switch (node.type) {
+      case 'OR':
+        return this.evaluate(node.left!, actual) || this.evaluate(node.right!, actual);
+      case 'AND':
+        return this.evaluate(node.left!, actual) && this.evaluate(node.right!, actual);
+      case 'NOT':
+        return !this.evaluate(node.expr!, actual);
+      case 'WORD': {
+        const str = actual == null ? '' : String(actual);
+        return node.exact
+          ? str === node.value!
+          : str.toLowerCase() === (node.value ?? '').toLowerCase();
+      }
+      case 'REGEX': {
+        const str = actual == null ? '' : String(actual);
+        try {
+          return new RegExp(node.pattern!, node.flags ?? '').test(str);
+        } catch {
+          return false;
+        }
+      }
+      case 'TRUE':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  private match(type: VTokenType): boolean {
+    if (this.check(type)) {
+      this.advance();
+      return true;
+    }
+    return false;
+  }
+  private check(type: VTokenType): boolean {
+    return !this.isAtEnd() && this.tokens[this.pos].type === type;
+  }
+  private advance(): VToken {
+    if (!this.isAtEnd()) this.pos++;
+    return this.tokens[this.pos - 1];
+  }
+  private consume(type: VTokenType): void {
+    if (this.check(type)) this.advance();
+  }
+  private isAtEnd(): boolean {
+    return this.tokens[this.pos].type === 'EOF';
+  }
+}
+
+// ── Main SourceParser ─────────────────────────────────────────────────────────
 
 export class SourceParser {
   private app: App;
   private tokens: Token[] = [];
   private current = 0;
+  private valueMatcher = new ValueMatcher();
 
   constructor(app: App) {
     this.app = app;
@@ -38,7 +266,6 @@ export class SourceParser {
   public parse(source: string): (file: TFile) => boolean {
     if (!source || !source.trim()) return () => true;
 
-    // Remove "FROM" if present (case insensitive)
     let cleanSource = source.trim();
     if (/^FROM\s+/i.test(cleanSource)) {
       cleanSource = cleanSource.replace(/^FROM\s+/i, '');
@@ -52,7 +279,7 @@ export class SourceParser {
       return (file: TFile) => this.evaluate(ast, file);
     } catch (e) {
       console.error('SourceParser Error:', e);
-      return () => false; // Fail safe
+      return () => false;
     }
   }
 
@@ -73,44 +300,72 @@ export class SourceParser {
         i++;
         continue;
       }
-
       if (char === ')') {
         tokens.push({ type: 'RPAREN' });
         i++;
         continue;
       }
 
-      if (char === '=') {
-        tokens.push({ type: 'EQUALS' });
-        i++;
+      // Bracket filter: [property] or [property:value-expr]
+      if (char === '[') {
+        i++; // skip [
+        let inner = '';
+        let depth = 0;
+        while (i < source.length) {
+          if (source[i] === '[') {
+            depth++;
+            inner += source[i++];
+            continue;
+          }
+          if (source[i] === ']') {
+            if (depth === 0) {
+              i++;
+              break;
+            }
+            depth--;
+            inner += source[i++];
+            continue;
+          }
+          // preserve quoted strings verbatim
+          if (source[i] === '"' || source[i] === "'") {
+            const q = source[i];
+            inner += source[i++];
+            while (i < source.length && source[i] !== q) {
+              if (source[i] === '\\') inner += source[i++];
+              inner += source[i++];
+            }
+            if (i < source.length) inner += source[i++];
+            continue;
+          }
+          inner += source[i++];
+        }
+
+        const colonIdx = inner.indexOf(':');
+        if (colonIdx === -1) {
+          tokens.push({ type: 'BRACKET_FILTER', property: inner.trim(), valueExpr: null });
+        } else {
+          const prop = inner.slice(0, colonIdx).trim();
+          const valExpr = inner.slice(colonIdx + 1).trim();
+          tokens.push({ type: 'BRACKET_FILTER', property: prop, valueExpr: valExpr });
+        }
         continue;
       }
 
-      // Negation: ! or -
-      // But - could be part of a word or tag if not separated
-      // DQL: -#tag is negation. -"folder" is negation.
-      // "folder-name" is a string.
-      // If - is followed by space, #, ", ', or (, it is definitely NOT.
-      // If - is followed by alphanum, it MIGHT be start of a negative number (not supported) or just a word starting with -?
-      // Let's assume - is NOT only if it's strictly a prefix operator.
-      // Actually, for simplicity in file paths, "my-file" is one token.
-      // So if '-' is at start of a token, check if it's standalone?
-      // A simple heuristic: if char is '!' it is NOT.
-      // If char is '-' and next char is space, #, ", ', (, or end of string, it is NOT.
+      // NOT: ! or - (when - is a prefix operator, not part of a word)
       if (
         char === '!' ||
-        (char === '-' && (i + 1 >= source.length || /[\s#("']/.test(source[i + 1])))
+        (char === '-' && (i + 1 >= source.length || /[\s#("'[]/.test(source[i + 1])))
       ) {
         tokens.push({ type: 'NOT' });
         i++;
         continue;
       }
 
-      // Quoted String
+      // Quoted string
       if (char === '"' || char === "'") {
         const quote = char;
         let val = '';
-        i++; // skip open quote
+        i++;
         while (i < source.length && source[i] !== quote) {
           if (source[i] === '\\' && i + 1 < source.length) {
             val += source[i + 1];
@@ -120,7 +375,7 @@ export class SourceParser {
             i++;
           }
         }
-        i++; // skip close quote
+        i++;
         tokens.push({ type: 'STRING', value: val });
         continue;
       }
@@ -129,10 +384,7 @@ export class SourceParser {
       if (char === '#') {
         let val = '#';
         i++;
-        // Read until we hit a delimiter or whitespace
-        // Allowed chars in tags are broad, but typically exclude space, #, comma, brackets
-        // We'll read until we hit a character that usually ends a tag
-        while (i < source.length && !/[\s#(),!"']/.test(source[i])) {
+        while (i < source.length && !/[\s#(),!"'[\]]/.test(source[i])) {
           val += source[i];
           i++;
         }
@@ -140,42 +392,21 @@ export class SourceParser {
         continue;
       }
 
-      if (char === '.') {
-        let val = '';
-        i++;
-        while (i < source.length && /[a-zA-Z0-9_-]/.test(source[i])) {
-          val += source[i];
-          i++;
-        }
-
-        if (val) {
-          tokens.push({ type: 'PROPERTY', value: val });
-          continue;
-        }
-      }
-
-      // Word / Identifier / Unquoted String
+      // Word / identifier / path
       if (/[a-zA-Z0-9_\-/.]/.test(char)) {
         let val = '';
         while (i < source.length && /[a-zA-Z0-9_\-/.]/.test(source[i])) {
           val += source[i];
           i++;
         }
-
         const lower = val.toLowerCase();
-        if (lower === 'and') {
-          tokens.push({ type: 'AND' });
-        } else if (lower === 'or') {
-          tokens.push({ type: 'OR' });
-        } else if (lower === 'not') {
-          tokens.push({ type: 'NOT' });
-        } else {
-          tokens.push({ type: 'STRING', value: val });
-        }
+        if (lower === 'and') tokens.push({ type: 'AND' });
+        else if (lower === 'or') tokens.push({ type: 'OR' });
+        else if (lower === 'not') tokens.push({ type: 'NOT' });
+        else tokens.push({ type: 'STRING', value: val });
         continue;
       }
 
-      // Unknown char
       i++;
     }
 
@@ -183,37 +414,33 @@ export class SourceParser {
     return tokens;
   }
 
-  // Parser
+  // ── Parser ──────────────────────────────────────────────────────────────────
+
   private expression(): ASTNode {
     return this.or();
   }
 
   private or(): ASTNode {
     let expr = this.and();
-
     while (this.match('OR')) {
       const right = this.and();
       expr = { type: 'OR', left: expr, right };
     }
-
     return expr;
   }
 
   private and(): ASTNode {
     let expr = this.unary();
-
     while (this.match('AND')) {
       const right = this.unary();
       expr = { type: 'AND', left: expr, right };
     }
-
     return expr;
   }
 
   private unary(): ASTNode {
     if (this.match('NOT')) {
-      const right = this.unary();
-      return { type: 'NOT', expr: right };
+      return { type: 'NOT', expr: this.unary() };
     }
     return this.primary();
   }
@@ -230,21 +457,21 @@ export class SourceParser {
       return { type: 'TAG', value: token.value };
     }
 
-    if (this.check('PROPERTY')) {
+    if (this.check('BRACKET_FILTER')) {
       const token = this.advance();
+      const prop = token.property!;
+      const valExpr = token.valueExpr;
 
-      if (this.match('EQUALS')) {
-        const valueToken = this.consumeValueToken();
-        if (valueToken) {
-          return {
-            type: 'PROPERTY_EQUALS',
-            property: token.value,
-            value: valueToken.value,
-          };
-        }
+      if (valExpr == null) {
+        // [property] — exists
+        return { type: 'PROPERTY_EXISTS', property: prop };
       }
-
-      return { type: 'PROPERTY_EXISTS', property: token.value };
+      if (valExpr.toLowerCase() === 'null') {
+        // [property:null] — exists but has no value
+        return { type: 'PROPERTY_NULL', property: prop };
+      }
+      // [property:expr] — value matches sub-expression
+      return { type: 'PROPERTY_MATCH', property: prop, valueExpr: valExpr };
     }
 
     if (this.check('STRING')) {
@@ -252,19 +479,12 @@ export class SourceParser {
       return { type: 'STRING', value: token.value };
     }
 
-    // Default / Error recovery
-    // If we hit here, likely unexpected token.
-    // Return a safe "true" node or throw.
-    // For robustness, return an empty node that evaluates to false or true?
-    // Let's consume one token to avoid infinite loop if strictly needed,
-    // but since we check tokens, we might just be at EOF or invalid.
-    if (!this.isAtEnd()) {
-      this.advance();
-    }
+    if (!this.isAtEnd()) this.advance();
     return { type: 'TRUE' };
   }
 
-  // Helpers
+  // ── Token helpers ───────────────────────────────────────────────────────────
+
   private match(type: TokenType): boolean {
     if (this.check(type)) {
       this.advance();
@@ -288,18 +508,12 @@ export class SourceParser {
     return null;
   }
 
-  private consumeValueToken(): Token | null {
-    if (this.check('STRING') || this.check('TAG') || this.check('PROPERTY')) {
-      return this.advance();
-    }
-    return null;
-  }
-
   private isAtEnd(): boolean {
     return this.tokens[this.current].type === 'EOF';
   }
 
-  // Evaluator
+  // ── Evaluator ───────────────────────────────────────────────────────────────
+
   private evaluate(node: ASTNode, file: TFile): boolean {
     if (!node) return true;
 
@@ -314,8 +528,10 @@ export class SourceParser {
         return this.hasTag(file, node.value!);
       case 'PROPERTY_EXISTS':
         return this.hasProperty(file, node.property!);
-      case 'PROPERTY_EQUALS':
-        return this.propertyEquals(file, node.property!, node.value!);
+      case 'PROPERTY_NULL':
+        return this.isPropertyNull(file, node.property!);
+      case 'PROPERTY_MATCH':
+        return this.propertyMatch(file, node.property!, node.valueExpr!);
       case 'STRING':
         return this.isPath(file, node.value!);
       case 'TRUE':
@@ -328,17 +544,10 @@ export class SourceParser {
   private hasTag(file: TFile, tag: string): boolean {
     const cache = this.app.metadataCache.getFileCache(file);
     if (!cache) return false;
-
     const allTags = getAllTags(cache);
     if (!allTags) return false;
-
-    // Normalize tag: ensure it starts with #
     const searchTag = tag.startsWith('#') ? tag : '#' + tag;
-
-    return allTags.some(t => {
-      // getAllTags returns tags like "#tag", so we check exact match or sub-tag
-      return t === searchTag || t.startsWith(searchTag + '/');
-    });
+    return allTags.some(t => t === searchTag || t.startsWith(searchTag + '/'));
   }
 
   private getFrontmatter(file: TFile): FrontMatterCache | null {
@@ -347,56 +556,26 @@ export class SourceParser {
   }
 
   private hasProperty(file: TFile, property: string): boolean {
-    const frontmatter = this.getFrontmatter(file);
-    if (!frontmatter) return false;
-
-    return Object.prototype.hasOwnProperty.call(frontmatter, property);
+    const fm = this.getFrontmatter(file);
+    return fm != null && Object.prototype.hasOwnProperty.call(fm, property);
   }
 
-  private propertyEquals(file: TFile, property: string, expectedValue: string): boolean {
-    const frontmatter = this.getFrontmatter(file);
-    if (!frontmatter || !Object.prototype.hasOwnProperty.call(frontmatter, property)) {
-      return false;
-    }
-
-    const actualValue = frontmatter[property];
-    return this.matchesFrontmatterValue(actualValue, expectedValue);
+  private isPropertyNull(file: TFile, property: string): boolean {
+    const fm = this.getFrontmatter(file);
+    if (!fm || !Object.prototype.hasOwnProperty.call(fm, property)) return false;
+    // Only true for YAML null / missing value — not for "" or []
+    return fm[property] == null;
   }
 
-  private matchesFrontmatterValue(actualValue: unknown, expectedValue: string): boolean {
-    if (actualValue == null) return false;
-
-    if (Array.isArray(actualValue)) {
-      return actualValue.some(value => this.matchesFrontmatterValue(value, expectedValue));
-    }
-
-    if (typeof actualValue === 'boolean') {
-      const normalized = expectedValue.toLowerCase();
-      if (normalized !== 'true' && normalized !== 'false') return false;
-      return actualValue === (normalized === 'true');
-    }
-
-    if (typeof actualValue === 'number') {
-      const expectedNumber = Number(expectedValue);
-      return Number.isFinite(expectedNumber) && actualValue === expectedNumber;
-    }
-
-    if (typeof actualValue === 'string') {
-      return actualValue === expectedValue;
-    }
-
-    return false;
+  private propertyMatch(file: TFile, property: string, valueExpr: string): boolean {
+    const fm = this.getFrontmatter(file);
+    if (!fm || !Object.prototype.hasOwnProperty.call(fm, property)) return false;
+    const actual = fm[property];
+    if (actual == null) return false;
+    return this.valueMatcher.test(valueExpr, actual);
   }
 
   private isPath(file: TFile, path: string): boolean {
-    // Simple prefix match for folder or file
-    // "folder" matches "folder/file.md"
-    // "file.md" matches "file.md" (if at root) or "folder/file.md" ??
-    // Dataview behavior:
-    // FROM "folder" -> path starts with "folder"
-    // FROM "file" -> path is exactly "file" or ends with?
-    // Usually path matching is strictly prefix in Dataview for folders.
-    // But if I say "Daily/2023", it matches "Daily/2023-01.md".
     return file.path.startsWith(path);
   }
 }
