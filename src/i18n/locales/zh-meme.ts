@@ -21,14 +21,16 @@ export default {
       },
       globalFilter: {
         name: '全球过滤器',
-        desc: '过滤器被申请到最近的锉刀们和随机的音符模块们。支持逻辑操作员们（和，或，不），标签们（#标签），以及细绳们（"文件夹"）。',
+        desc: '过滤器被申请到最近的锉刀们和随机的音符模块们。支持逻辑操作员们（和，或，不），标签们（#标签），细绳们（"文件夹"），以及 [财产:值] 形式的财产过滤。',
         syntaxHelp: {
           label: '疑问语法例子们',
           ariaLabel: '展示全球过滤器疑问语法帮助',
-          intro: '支持小径们，标签们，和 / 或 / 非逻辑，以及 [财产] / [财产:值] 前物质过滤。',
+          intro:
+            '支持小径们，标签们，和 / 或 / 非逻辑，以及 [财产] / [财产:值] 形式的过滤；财产可以来自前物质，也可以来自锉刀字段，像 path、name、basename、extension。',
           exampleExclude: '例子：(-"脚本") AND (-"去做")',
           exampleTag: '例子：#被发表的',
           exampleProperty: '例子：[状态:活跃的]',
+          exampleFileProperty: '例子：[extension:base]',
           exampleCombined: '例子："音符" AND NOT #草稿 AND [被回顾的:真的]',
         },
       },
@@ -322,20 +324,21 @@ export default {
         },
         columns: {
           heading: '内容列们',
-          desc: "配置那些被展示在最近的锉刀模块里的列。'泉水'田野支持数据视图-喜欢的疑问，也支持 [财产] / [财产:值] 前物质过滤。",
+          desc: "配置那些被展示在最近的锉刀模块里的列。'泉水'田野支持数据视图-喜欢的疑问，也支持 [财产] / [财产:值] 形式的财产过滤。",
           syntaxHelp: {
             label: '疑问语法例子们',
             ariaLabel: '展示最近的锉刀疑问语法帮助',
             intro:
-              '支持小径、标签、AND / OR / NOT 逻辑操作员，也支持 [财产] / [财产:值] 前物质过滤。',
+              '支持小径、标签、AND / OR / NOT 逻辑操作员，也支持 [财产] / [财产:值] 形式的过滤；财产可以来自前物质，也可以来自锉刀字段，像 path、name、basename、extension。',
             examplePath: '例子："文件夹" 和 #标签',
             exampleProperty: '例子：[status]',
             examplePropertyValue: '例子：[status:active]',
+            exampleFileProperty: '例子：[extension:base]',
             exampleCombined: '例子："Projects" 和 #pinned 和 [reviewed:true]',
           },
           placeholder: '列头衔',
           sourceLabel: '泉水疑问:',
-          sourcePlaceholder: '例如 "文件夹" 和 #标签 和 [status:active]',
+          sourcePlaceholder: '例如 "文件夹" 和 #标签 和 [status:active] 和 [extension:base]',
           templateLabel: '模板者模板小径:',
           templatePlaceholder: '离开空白为了空的音符。例子: @临时/音符.md',
           addBtn: '+ 增加列',
@@ -352,10 +355,12 @@ export default {
           syntaxHelp: {
             label: '疑问语法例子们',
             ariaLabel: '展示随机的音符疑问语法帮助',
-            intro: '支持小径们，标签们，和 / 或 / 非逻辑，以及 [财产] / [财产:值] 前物质过滤。',
+            intro:
+              '支持小径们，标签们，和 / 或 / 非逻辑，以及 [财产] / [财产:值] 形式的过滤；财产可以来自前物质，也可以来自锉刀字段，像 path、name、basename、extension。',
             exampleExclude: '例子：(-"脚本") AND (-"视图")',
             exampleTag: '例子：#被发表的',
             exampleProperty: '例子：[状态:活跃的]',
+            exampleFileProperty: '例子：[extension:base]',
             exampleCombined: '例子："音符" AND NOT #草稿 AND [被回顾的:真的]',
           },
         },

@@ -555,12 +555,35 @@ export class SourceParser {
     return cache?.frontmatter ?? null;
   }
 
+  private getFileProperty(file: TFile, property: string): string | undefined {
+    switch (property.toLowerCase()) {
+      case 'path':
+        return file.path;
+      case 'name':
+        return file.name;
+      case 'basename':
+        return file.basename;
+      case 'extension':
+        return file.extension;
+      default:
+        return undefined;
+    }
+  }
+
   private hasProperty(file: TFile, property: string): boolean {
+    if (this.getFileProperty(file, property) !== undefined) {
+      return true;
+    }
+
     const fm = this.getFrontmatter(file);
     return fm != null && Object.prototype.hasOwnProperty.call(fm, property);
   }
 
   private isPropertyNull(file: TFile, property: string): boolean {
+    if (this.getFileProperty(file, property) !== undefined) {
+      return false;
+    }
+
     const fm = this.getFrontmatter(file);
     if (!fm || !Object.prototype.hasOwnProperty.call(fm, property)) return false;
     // Only true for YAML null / missing value — not for "" or []
@@ -568,6 +591,11 @@ export class SourceParser {
   }
 
   private propertyMatch(file: TFile, property: string, valueExpr: string): boolean {
+    const fileProperty = this.getFileProperty(file, property);
+    if (fileProperty !== undefined) {
+      return this.valueMatcher.test(valueExpr, fileProperty);
+    }
+
     const fm = this.getFrontmatter(file);
     if (!fm || !Object.prototype.hasOwnProperty.call(fm, property)) return false;
     const actual = fm[property];

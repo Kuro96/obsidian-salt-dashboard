@@ -173,6 +173,27 @@
   text-overflow: ellipsis;
 }
 
+.rf-title-group--clickable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: color 0.15s;
+}
+
+.rf-title-group--clickable:hover {
+  color: var(--interactive-accent);
+}
+
+.rf-title-group--expanded {
+  color: var(--interactive-accent);
+}
+
+.rf-back-icon {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
 .rf-controls {
   display: flex;
   align-items: center;

@@ -21,15 +21,16 @@ export default {
       },
       globalFilter: {
         name: '全局过滤',
-        desc: '应用于“最近文件”和“随机笔记”模块的过滤器。支持逻辑运算符（AND, OR, NOT）、标签（#tag）和字符串（"folder"）。',
+        desc: '应用于“最近文件”和“随机笔记”模块的过滤器。支持逻辑运算符（AND, OR, NOT）、标签（#tag）、字符串（"folder"），以及 [property:value] 形式的属性过滤。',
         syntaxHelp: {
           label: '查询语法示例',
           ariaLabel: '显示全局过滤查询语法帮助',
           intro:
-            '支持路径、标签、AND / OR / NOT 逻辑运算，以及 [属性] / [属性:值] frontmatter 过滤。',
+            '支持路径、标签、AND / OR / NOT 逻辑运算，以及 [属性] / [属性:值] 形式的过滤；属性既可来自 frontmatter，也可来自文件字段（如 path、name、basename、extension）。',
           exampleExclude: '示例：(-"SCRIPTS") AND (-"TODO")',
           exampleTag: '示例：#published',
           exampleProperty: '示例：[status:active]',
+          exampleFileProperty: '示例：[extension:base]',
           exampleCombined: '示例："notes" AND NOT #draft AND [reviewed:true]',
         },
       },
@@ -317,20 +318,21 @@ export default {
         },
         columns: {
           heading: '内容列',
-          desc: '配置最近文件模块中显示的列。“来源”字段支持类 Dataview 查询，并支持 [属性] / [属性:值] 形式的 frontmatter 过滤。',
+          desc: '配置最近文件模块中显示的列。“来源”字段支持类 Dataview 查询，并支持 [属性] / [属性:值] 形式的属性过滤。',
           syntaxHelp: {
             label: '查询语法示例',
             ariaLabel: '显示 recent files 查询语法帮助',
             intro:
-              '支持路径、标签、AND / OR / NOT 逻辑运算，以及 [属性] / [属性:值] frontmatter 过滤。',
+              '支持路径、标签、AND / OR / NOT 逻辑运算，以及 [属性] / [属性:值] 形式的过滤；属性既可来自 frontmatter，也可来自文件字段（如 path、name、basename、extension）。',
             examplePath: '示例："Folder" AND #tag',
             exampleProperty: '示例：[status]',
             examplePropertyValue: '示例：[status:active]',
+            exampleFileProperty: '示例：[extension:base]',
             exampleCombined: '示例："Projects" AND #pinned AND [reviewed:true]',
           },
           placeholder: '列标题',
           sourceLabel: '来源查询:',
-          sourcePlaceholder: '例如 "Folder" AND #tag AND [status:active]',
+          sourcePlaceholder: '例如 "Folder" AND #tag AND [status:active] AND [extension:base]',
           templateLabel: 'Templater 模板路径:',
           templatePlaceholder:
             '留空表示仅新建空白笔记。如果指定路径(如: @tmp/notes.md)，则使用该模板来创建新笔记。',
@@ -349,10 +351,11 @@ export default {
             label: '查询语法示例',
             ariaLabel: '显示随机笔记查询语法帮助',
             intro:
-              '支持路径、标签、AND / OR / NOT 逻辑运算，以及 [属性] / [属性:值] frontmatter 过滤。',
+              '支持路径、标签、AND / OR / NOT 逻辑运算，以及 [属性] / [属性:值] 形式的过滤；属性既可来自 frontmatter，也可来自文件字段（如 path、name、basename、extension）。',
             exampleExclude: '示例：(-"SCRIPTS") AND (-"VIEWS")',
             exampleTag: '示例：#published',
             exampleProperty: '示例：[status:active]',
+            exampleFileProperty: '示例：[extension:base]',
             exampleCombined: '示例："notes" AND NOT #draft AND [reviewed:true]',
           },
         },

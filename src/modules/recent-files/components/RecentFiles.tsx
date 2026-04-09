@@ -37,6 +37,21 @@ export const RecentFiles: React.FC = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [cols, setCols] = React.useState(1);
 
+  // Expanded column state
+  const [expandedColId, setExpandedColId] = React.useState<string | null>(null);
+  const prevLimitRef = React.useRef<number>(6);
+
+  const handleTitleClick = (colId: string, currentLimit: number) => {
+    if (expandedColId === colId) {
+      setExpandedColId(null);
+      updateColumnState(colId, { limit: prevLimitRef.current });
+    } else {
+      prevLimitRef.current = currentLimit;
+      setExpandedColId(colId);
+      updateColumnState(colId, { limit: 9999 });
+    }
+  };
+
   // New Note State
   const [creatingNoteColId, setCreatingNoteColId] = React.useState<string | null>(null);
   const [newNoteTitle, setNewNoteTitle] = React.useState('');
@@ -93,12 +108,41 @@ export const RecentFiles: React.FC = () => {
             sortBy: 'mtime',
             sortOrder: 'desc',
           };
+          const isExpanded = expandedColId === col.id;
+          const isHidden = expandedColId !== null && !isExpanded;
 
           return (
-            <div key={col.id} className="rf-column">
+            <div
+              key={col.id}
+              className={`rf-column${isExpanded ? ' rf-column--expanded' : ''}`}
+              style={
+                isHidden ? { display: 'none' } : isExpanded ? { gridColumn: '1 / -1' } : undefined
+              }
+            >
               <div className="rf-header">
-                <div className="rf-title-group">
-                  <span className="rf-icon">{col.icon}</span>
+                <div
+                  className={`rf-title-group rf-title-group--clickable${expandedColId === col.id ? ' rf-title-group--expanded' : ''}`}
+                  onClick={() => handleTitleClick(col.id, state.limit)}
+                >
+                  {expandedColId === col.id ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="rf-back-icon"
+                    >
+                      <path d="M19 12H5" />
+                      <path d="M12 19l-7-7 7-7" />
+                    </svg>
+                  ) : (
+                    <span className="rf-icon">{col.icon}</span>
+                  )}
                   <span className="rf-title">{col.title}</span>
                 </div>
                 <div className="rf-controls">
@@ -200,7 +244,18 @@ export const RecentFiles: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="rf-list">
+              <div
+                className="rf-list"
+                style={
+                  isExpanded
+                    ? {
+                        display: 'grid',
+                        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                        gap: '4px 16px',
+                      }
+                    : undefined
+                }
+              >
                 {filesByColumn[col.id]?.map(file => (
                   <div
                     key={file.path}
