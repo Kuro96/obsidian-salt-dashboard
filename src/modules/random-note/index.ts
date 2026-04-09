@@ -42,6 +42,7 @@ export const RandomNoteModule: DashboardModule = {
         i18n.t('modules.settings.randomNote.query.syntaxHelp.exampleTag'),
         i18n.t('modules.settings.randomNote.query.syntaxHelp.exampleProperty'),
         i18n.t('modules.settings.randomNote.query.syntaxHelp.exampleFileProperty'),
+        i18n.t('modules.settings.randomNote.query.syntaxHelp.exampleFieldReference'),
         i18n.t('modules.settings.randomNote.query.syntaxHelp.exampleCombined'),
       ],
       iconText: 'i',

@@ -95,6 +95,7 @@ export class HomepageSettingTab extends PluginSettingTab {
         i18n.t('settings.general.globalFilter.syntaxHelp.exampleTag'),
         i18n.t('settings.general.globalFilter.syntaxHelp.exampleProperty'),
         i18n.t('settings.general.globalFilter.syntaxHelp.exampleFileProperty'),
+        i18n.t('settings.general.globalFilter.syntaxHelp.exampleFieldReference'),
         i18n.t('settings.general.globalFilter.syntaxHelp.exampleCombined'),
       ],
       iconText: 'i',

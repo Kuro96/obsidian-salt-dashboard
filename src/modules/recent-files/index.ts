@@ -89,6 +89,7 @@ export const RecentFilesModule: DashboardModule = {
         i18n.t('modules.settings.recentFiles.columns.syntaxHelp.exampleProperty'),
         i18n.t('modules.settings.recentFiles.columns.syntaxHelp.examplePropertyValue'),
         i18n.t('modules.settings.recentFiles.columns.syntaxHelp.exampleFileProperty'),
+        i18n.t('modules.settings.recentFiles.columns.syntaxHelp.exampleFieldReference'),
         i18n.t('modules.settings.recentFiles.columns.syntaxHelp.exampleCombined'),
       ],
       iconText: 'i',

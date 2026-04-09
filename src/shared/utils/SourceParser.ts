@@ -565,9 +565,33 @@ export class SourceParser {
         return file.basename;
       case 'extension':
         return file.extension;
+      case 'parent.name':
+        return file.parent?.name;
+      case 'parent.path':
+        return file.parent?.path;
       default:
         return undefined;
     }
+  }
+
+  private getReferencedFileProperty(file: TFile, valueExpr: string): string | undefined {
+    if (!valueExpr.startsWith('@')) {
+      return undefined;
+    }
+
+    return this.getFileProperty(file, valueExpr.slice(1));
+  }
+
+  private valuesEqual(actual: unknown, expected: string): boolean {
+    if (Array.isArray(actual)) {
+      return actual.some(value => this.valuesEqual(value, expected));
+    }
+
+    if (actual == null) {
+      return false;
+    }
+
+    return String(actual).toLowerCase() === expected.toLowerCase();
   }
 
   private hasProperty(file: TFile, property: string): boolean {
@@ -591,8 +615,14 @@ export class SourceParser {
   }
 
   private propertyMatch(file: TFile, property: string, valueExpr: string): boolean {
+    const referencedFileProperty = this.getReferencedFileProperty(file, valueExpr);
     const fileProperty = this.getFileProperty(file, property);
+
     if (fileProperty !== undefined) {
+      if (referencedFileProperty !== undefined) {
+        return this.valuesEqual(fileProperty, referencedFileProperty);
+      }
+
       return this.valueMatcher.test(valueExpr, fileProperty);
     }
 
@@ -600,6 +630,11 @@ export class SourceParser {
     if (!fm || !Object.prototype.hasOwnProperty.call(fm, property)) return false;
     const actual = fm[property];
     if (actual == null) return false;
+
+    if (referencedFileProperty !== undefined) {
+      return this.valuesEqual(actual, referencedFileProperty);
+    }
+
     return this.valueMatcher.test(valueExpr, actual);
   }
 
