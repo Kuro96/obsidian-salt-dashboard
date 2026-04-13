@@ -55,17 +55,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
         title: '📝 Regular Tasks',
       },
       {
-        id: 'jottings-todo',
-        order: 4,
-        width: 4,
-        x: 8,
-        y: 16,
-        w: 4,
-        h: 10,
-        enabled: true,
-        title: '✍️ Jottings Tasks',
-      },
-      {
         id: 'recent-files',
         order: 5,
         width: 12,
@@ -114,7 +103,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
     tooltipEnabled: true,
     enableDailyTodo: true,
     enableRegularTodo: true,
-    enableJottingsTodo: true,
   },
 
   // Daily TODO
@@ -135,22 +123,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
     dateFormat: 'YYMMDD',
     autoCreateFile: true,
     maxItems: 10,
-    showPinButton: true,
-    showAbandonButton: true,
-    showDeleteButton: true,
-    statusFilters: ['active'],
-    sortBy: 'default',
-    sortOrder: 'asc',
-  },
-
-  // Jottings TODO
-  jottingsTodo: {
-    jottingsFolder: 'jottings',
-    doneTag: 'jottings/done',
-    abandonedTag: 'jottings/abandoned',
-    maxItems: 10,
-    templatePath: '',
-    jottingsPathPattern: '[jottings]/YYYY/MM', // Default to User's preference
     showPinButton: true,
     showAbandonButton: true,
     showDeleteButton: true,

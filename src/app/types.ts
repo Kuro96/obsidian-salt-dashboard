@@ -23,14 +23,12 @@ export interface Task {
   isAbandoned: boolean; // 是否放弃
   isPinned: boolean; // 是否置顶
   isDaily: boolean; // 是否为日常任务
-  isJottings: boolean; // 是否为 jottings 任务
   sourceFile: TFile | null; // 源文件对象
   sourcePath: string; // 源文件路径
   lineNumber: number; // 行号
   completedDate?: string; // 完成日期 (YYYY-MM-DD)
   abandonedDate?: string; // 放弃日期 (YYYY-MM-DD)
   tags: string[]; // 标签列表
-  jottingLinks?: string[]; // 关联的 jottings 链接
   crontab?: CrontabExpression; // crontab 表达式 (仅 daily 任务)
   isDue?: boolean; // 是否今天到期 (动态计算)
   nextTriggerDate?: Date | null; // 下次触发日期 (动态计算)
@@ -69,7 +67,6 @@ export interface TodoModuleConfig extends ModuleConfig {
   todoSourceFolder?: string; // 源文件夹路径 (from global settings)
   statsFile?: string; // 统计数据文件路径 (from global settings, injected at runtime)
   templatePath?: string; // Templater 模板路径 (optional)
-  jottingsFolder?: string; // jottings 文件夹路径 (optional)
   statusFilters?: string[]; // 状态过滤 (NEW)
   sortBy?: SortOption; // 排序方式 (NEW)
   sortOrder?: SortOrder; // 排序方向 (NEW)
@@ -91,21 +88,11 @@ export interface RegularTodoConfig extends TodoModuleConfig {
   excludedFiles?: string[]; // 排除的文件名列表
 }
 
-// Jottings TODO 配置
-export interface JottingsTodoConfig extends TodoModuleConfig {
-  jottingsFolder: string; // jottings 笔记文件夹
-  doneTag: string; // 完成时的标签
-  abandonedTag: string; // 放弃时的标签
-  templatePath?: string; // Templater 模板路径
-  jottingsPathPattern?: string; // jottings 生成路径模式 (e.g. jottings/YYYY/MM)
-}
-
 // ContributionGraph 配置
 export interface ContributionGraphConfig extends ModuleConfig {
   tooltipEnabled: boolean; // 是否启用悬停提示
   enableDailyTodo: boolean; // 是否启用 DailyTodo 数据源
   enableRegularTodo: boolean; // 是否启用 RegularTodo 数据源
-  enableJottingsTodo: boolean; // 是否启用 JottingsTodo 数据源
 }
 
 // DateProgress 配置
@@ -166,7 +153,6 @@ export interface HomepageSettings {
   contributionGraph: ContributionGraphConfig;
   dailyTodo: DailyTodoConfig;
   regularTodo: RegularTodoConfig;
-  jottingsTodo: JottingsTodoConfig;
   recentFiles: RecentFilesConfig;
   randomNote: RandomNoteConfig;
   tmpNote: TmpNoteConfig;

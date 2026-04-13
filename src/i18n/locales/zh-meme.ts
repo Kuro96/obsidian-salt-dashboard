@@ -250,7 +250,6 @@ export default {
       sources: {
         daily: '日常的去做',
         regular: '规律的去做',
-        jottings: '乱写',
       },
       tooltip: {
         loading: '加载中...',
@@ -281,22 +280,6 @@ export default {
         autoCreate: {
           name: '汽车创造锉刀',
           desc: '创造今天的锉刀如果丢失当检查任务时。',
-        },
-        showPinButton: { name: '展示大头针按钮', desc: '展示大头针操作按钮在每一条任务旁边。' },
-        showAbandonButton: { name: '展示抛弃按钮', desc: '展示抛弃操作按钮在每一条任务旁边。' },
-        showDeleteButton: { name: '展示删除按钮', desc: '展示删除操作按钮在每一条任务旁边。' },
-      },
-      jottingsTodo: {
-        title: '乱写的去做',
-        heading: '乱写的去做设定集',
-        folder: { name: '乱写文件夹', desc: '文件夹在哪里乱写音符生活。' },
-        pathPattern: {
-          name: '代产生小径模式',
-          desc: '小径模式为了新的乱写 (例如 [乱写]/YYYY/MM)。包裹文本在 [] 里去避免格式化。',
-        },
-        template: {
-          name: '乱写模板小径',
-          desc: '小径去模板者模板为了新的乱写 (例如 模板们/乱写.md)。离开空去使不能。',
         },
         showPinButton: { name: '展示大头针按钮', desc: '展示大头针操作按钮在每一条任务旁边。' },
         showAbandonButton: { name: '展示抛弃按钮', desc: '展示抛弃操作按钮在每一条任务旁边。' },
@@ -373,7 +356,6 @@ export default {
         heading: '捐赠图表设定集',
         enableDaily: '能够日常的去做',
         enableRegular: '能够规律的去做',
-        enableJottings: '能够乱写的去做',
         click: {
           name: '点击行为',
           desc: '什么发生当你点击一个天。',

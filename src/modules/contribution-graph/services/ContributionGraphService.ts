@@ -31,7 +31,7 @@ export class ContributionGraphService {
       });
     }
 
-    if (this.config.enableRegularTodo || this.config.enableJottingsTodo) {
+    if (this.config.enableRegularTodo) {
       const folderPath = this.settings.todoSourceFolder || 'TODO';
       const files = this.app.vault
         .getFiles()
@@ -42,23 +42,11 @@ export class ContributionGraphService {
         const lines = content.split('\n');
 
         lines.forEach(line => {
-          // Match completed tasks with date
           const match = line.match(/- \[[x!]\] .*✅ (\d{4}-\d{2}-\d{2})/);
           if (match) {
             const date = match[1];
             if (moment(date).isAfter(startDate)) {
-              const isJottings = line.includes('[[jottings/');
-
-              let shouldCount = false;
-              if (isJottings && this.config.enableJottingsTodo) {
-                shouldCount = true;
-              } else if (!isJottings && this.config.enableRegularTodo) {
-                shouldCount = true;
-              }
-
-              if (shouldCount) {
-                data.set(date, (data.get(date) || 0) + 1);
-              }
+              data.set(date, (data.get(date) || 0) + 1);
             }
           }
         });
@@ -68,13 +56,10 @@ export class ContributionGraphService {
     return data;
   }
 
-  async getCompletedTasksByDate(
-    date: string
-  ): Promise<{ daily: any[]; regular: any[]; jottings: any[] }> {
-    const result: { daily: any[]; regular: any[]; jottings: any[] } = {
+  async getCompletedTasksByDate(date: string): Promise<{ daily: any[]; regular: any[] }> {
+    const result: { daily: any[]; regular: any[] } = {
       daily: [],
       regular: [],
-      jottings: [],
     };
 
     if (this.config.enableDailyTodo) {
@@ -82,7 +67,7 @@ export class ContributionGraphService {
       result.daily = dailyTasks.map(t => ({ text: t, completed: true }));
     }
 
-    if (this.config.enableRegularTodo || this.config.enableJottingsTodo) {
+    if (this.config.enableRegularTodo) {
       const folderPath = this.settings.todoSourceFolder || 'TODO';
       const files = this.app.vault
         .getFiles()
@@ -93,19 +78,11 @@ export class ContributionGraphService {
         const lines = content.split('\n');
         lines.forEach(line => {
           if (line.includes(`✅ ${date}`)) {
-            const isJottings = line.includes('[[jottings/');
-
-            const task = {
+            result.regular.push({
               text: line.replace(/- \[[x!]\] /, '').replace(/ ✅ \d{4}-\d{2}-\d{2}/, ''),
               completed: true,
               sourcePath: file.path,
-            };
-
-            if (isJottings && this.config.enableJottingsTodo) {
-              result.jottings.push(task);
-            } else if (!isJottings && this.config.enableRegularTodo) {
-              result.regular.push(task);
-            }
+            });
           }
         });
       }

@@ -86,7 +86,6 @@ export const ContributionGraph: React.FC = () => {
     updateConfig({
       enableDailyTodo: selectedValues.includes('daily'),
       enableRegularTodo: selectedValues.includes('regular'),
-      enableJottingsTodo: selectedValues.includes('jottings'),
     });
   };
 
@@ -94,12 +93,10 @@ export const ContributionGraph: React.FC = () => {
   const selectedSources = [];
   if (config.enableDailyTodo) selectedSources.push('daily');
   if (config.enableRegularTodo) selectedSources.push('regular');
-  if (config.enableJottingsTodo) selectedSources.push('jottings');
 
   const sourceOptions: MultiSelectOption[] = [
     { label: t('modules.contributionGraph.sources.daily'), value: 'daily' },
     { label: t('modules.contributionGraph.sources.regular'), value: 'regular' },
-    { label: t('modules.contributionGraph.sources.jottings'), value: 'jottings' },
   ];
 
   // Calculate max count for dynamic color scaling
@@ -201,11 +198,7 @@ export const ContributionGraph: React.FC = () => {
 
       const details = await getTaskDetails(date);
       // Combine all tasks for preview
-      const allTasks = [
-        ...(details.daily || []),
-        ...(details.regular || []),
-        ...(details.jottings || []),
-      ];
+      const allTasks = [...(details.daily || []), ...(details.regular || [])];
 
       setTooltip(prev => {
         if (prev.date !== date) return prev; // Mouse moved away (or pinned changed, but date check is safer)

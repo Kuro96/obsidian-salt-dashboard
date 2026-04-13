@@ -31,14 +31,5 @@ export const ContributionGraphModule: DashboardModule = {
           await (plugin as any).saveSettings();
         })
       );
-
-    new Setting(containerEl)
-      .setName(i18n.t('modules.settings.contributionGraph.enableJottings'))
-      .addToggle(toggle =>
-        toggle.setValue(settings.contributionGraph.enableJottingsTodo).onChange(async value => {
-          settings.contributionGraph.enableJottingsTodo = value;
-          await (plugin as any).saveSettings();
-        })
-      );
   },
 };

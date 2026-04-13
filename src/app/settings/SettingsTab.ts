@@ -217,10 +217,6 @@ export class HomepageSettingTab extends PluginSettingTab {
             if (mod.id === 'regular-todo') {
               this.plugin.settings.contributionGraph.enableRegularTodo = val;
             }
-            if (mod.id === 'jottings-todo') {
-              this.plugin.settings.contributionGraph.enableJottingsTodo = val;
-            }
-
             await this.plugin.saveSettings();
             this.display();
           })

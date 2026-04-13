@@ -250,7 +250,6 @@ export default {
       sources: {
         daily: 'Daily Todo',
         regular: 'Regular Todo',
-        jottings: 'Jottings',
       },
       tooltip: {
         loading: 'Loading...',
@@ -287,31 +286,6 @@ export default {
         autoCreate: {
           name: 'Auto Create File',
           desc: "Create today's file if missing when checking tasks.",
-        },
-        showPinButton: {
-          name: 'Show Pin Button',
-          desc: 'Show the pin action button in each task row.',
-        },
-        showAbandonButton: {
-          name: 'Show Abandon Button',
-          desc: 'Show the abandon action button in each task row.',
-        },
-        showDeleteButton: {
-          name: 'Show Delete Button',
-          desc: 'Show the delete action button in each task row.',
-        },
-      },
-      jottingsTodo: {
-        title: 'Jottings Todo',
-        heading: 'Jottings Todo Settings',
-        folder: { name: 'Jottings Folder', desc: 'Folder where jottings notes live.' },
-        pathPattern: {
-          name: 'Generation Path Pattern',
-          desc: 'Path pattern for new jottings (e.g. [jottings]/YYYY/MM). Wrap text in [] to avoid formatting.',
-        },
-        template: {
-          name: 'Jottings Template Path',
-          desc: 'Path to the Templater template for new jottings (e.g. Templates/Jotting.md). Leave empty to disable.',
         },
         showPinButton: {
           name: 'Show Pin Button',
@@ -397,7 +371,6 @@ export default {
         heading: 'Contribution Graph Settings',
         enableDaily: 'Enable Daily Todo',
         enableRegular: 'Enable Regular Todo',
-        enableJottings: 'Enable Jottings Todo',
         click: {
           name: 'Click Behavior',
           desc: 'What happens when you click a day.',

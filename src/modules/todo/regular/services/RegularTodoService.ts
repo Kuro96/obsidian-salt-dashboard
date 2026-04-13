@@ -15,7 +15,6 @@ export class RegularTodoService extends TodoBaseService {
   protected async fetchRawTasks(date?: string): Promise<Task[]> {
     const folderPath = this.config.todoSourceFolder || 'TODO';
     const excludedFiles = this.config.excludedFiles || [];
-    const jottingsFolder = this.config.jottingsFolder || 'jottings';
 
     const files = this.app.vault
       .getFiles()
@@ -37,12 +36,6 @@ export class RegularTodoService extends TodoBaseService {
         if (match) {
           const statusChar = match[1];
           const text = match[2];
-
-          const jottingsPrefixStr = `${jottingsFolder}/`;
-          const linkRegex = new RegExp(`\\[\\[${jottingsPrefixStr}.*?\\]\\]`);
-          if (linkRegex.test(text)) {
-            return;
-          }
 
           const isCompleted = statusChar === 'x';
           const isAbandoned = statusChar === '-';
@@ -68,7 +61,6 @@ export class RegularTodoService extends TodoBaseService {
             isAbandoned: isAbandoned,
             isPinned: isPinned,
             isDaily: false,
-            isJottings: false,
             sourceFile: file,
             sourcePath: file.path,
             lineNumber: index,
@@ -109,7 +101,6 @@ export class RegularTodoService extends TodoBaseService {
             isAbandoned: false,
             isPinned: false,
             isDaily: false,
-            isJottings: false,
             sourceFile: file,
             sourcePath: file.path,
             lineNumber: index,

@@ -27,7 +27,6 @@ export const DraggableModule = React.forwardRef<HTMLDivElement, DraggableModuleP
       const defaults: Record<string, string> = {
         'daily-todo': '📅 Daily Tasks',
         'regular-todo': '📝 Regular Tasks',
-        'jottings-todo': '✍️ Jottings Tasks',
         'contribution-graph': '📈 Activity',
         'recent-files': '🗂️ Recent Files',
         'random-note': '🎲 Random Note',
@@ -37,7 +36,6 @@ export const DraggableModule = React.forwardRef<HTMLDivElement, DraggableModuleP
       const keyMap: Record<string, string> = {
         'daily-todo': 'modules.todo.daily.title',
         'regular-todo': 'modules.todo.regular.title',
-        'jottings-todo': 'modules.todo.jottings.title',
         'contribution-graph': 'modules.contributionGraph.title',
         'recent-files': 'modules.recentFiles.title',
         'random-note': 'modules.randomNote.title',

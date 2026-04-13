@@ -20,7 +20,6 @@ import { DateProgressModule } from '../modules/date-progress';
 import { ContributionGraphModule } from '../modules/contribution-graph';
 import { DailyTodoModule } from '../modules/todo/daily';
 import { RegularTodoModule } from '../modules/todo/regular';
-import { JottingsTodoModule } from '../modules/todo/jottings';
 import { RecentFilesModule } from '../modules/recent-files';
 import { RandomNoteModule } from '../modules/random-note';
 import { TmpNoteModule } from '../modules/tmp-note';
@@ -36,7 +35,6 @@ export default class HomepagePlugin extends Plugin {
     registry.register(ContributionGraphModule);
     registry.register(DailyTodoModule);
     registry.register(RegularTodoModule);
-    registry.register(JottingsTodoModule);
     registry.register(RecentFilesModule);
     registry.register(RandomNoteModule);
     registry.register(TmpNoteModule);

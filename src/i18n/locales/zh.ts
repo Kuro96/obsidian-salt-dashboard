@@ -250,7 +250,6 @@ export default {
       sources: {
         daily: '每日待办',
         regular: '常规待办',
-        jottings: '随手记',
       },
       tooltip: {
         loading: '加载中...',
@@ -279,22 +278,6 @@ export default {
         heading: '常规待办设置',
         dateFormat: { name: '日期格式', desc: '每日文件的格式 (例如 YYMMDD)。' },
         autoCreate: { name: '自动创建文件', desc: '检查任务时如果今天的文件不存在则创建。' },
-        showPinButton: { name: '显示置顶按钮', desc: '在每条任务右侧显示置顶操作按钮。' },
-        showAbandonButton: { name: '显示放弃按钮', desc: '在每条任务右侧显示放弃操作按钮。' },
-        showDeleteButton: { name: '显示删除按钮', desc: '在每条任务右侧显示删除操作按钮。' },
-      },
-      jottingsTodo: {
-        title: '随手记待办',
-        heading: '随手记待办设置',
-        folder: { name: '随手记文件夹', desc: '随手记笔记所在的文件夹。' },
-        pathPattern: {
-          name: '生成路径模式',
-          desc: '新随手记的路径模式 (例如 [jottings]/YYYY/MM)。使用 [] 包裹不需要格式化的文本。',
-        },
-        template: {
-          name: '随手记模板路径',
-          desc: '新随手记的 Templater 模板路径 (例如 Templates/Jotting.md)。留空以禁用。',
-        },
         showPinButton: { name: '显示置顶按钮', desc: '在每条任务右侧显示置顶操作按钮。' },
         showAbandonButton: { name: '显示放弃按钮', desc: '在每条任务右侧显示放弃操作按钮。' },
         showDeleteButton: { name: '显示删除按钮', desc: '在每条任务右侧显示删除操作按钮。' },
@@ -368,7 +351,6 @@ export default {
         heading: '贡献图设置',
         enableDaily: '启用每日待办',
         enableRegular: '启用常规待办',
-        enableJottings: '启用随手记待办',
         click: {
           name: '点击行为',
           desc: '点击某一天时发生什么。',
