@@ -37,9 +37,11 @@ const RESOURCES = {
     settings: {
       heading: 'Jotting Task Settings',
       allowedRoots: 'Allowed root folders',
-      allowedRootsDesc: 'Comma-separated roots to scan for jotting notes (default: personal,work)',
-      newJottingRoot: 'New jotting root',
-      newJottingRootDesc: 'Root folder for newly created jotting notes',
+      allowedRootsDesc:
+        'Comma-separated list of roots to scan. New notes are created in the first root that exists in the vault.',
+      templatePath: 'Templater template path',
+      templatePathDesc:
+        'Path to a Templater template file (e.g. Templates/jotting.md). Leave blank to use the built-in frontmatter.',
       showPinButton: 'Show pin button',
       showAbandonButton: 'Show abandon button',
       showDeleteButton: 'Show delete button',
@@ -63,9 +65,10 @@ const RESOURCES = {
     settings: {
       heading: '灵感任务设置',
       allowedRoots: '允许的根目录',
-      allowedRootsDesc: '逗号分隔，扫描灵感笔记的根目录（默认：personal,work）',
-      newJottingRoot: '新建笔记根目录',
-      newJottingRootDesc: '新建灵感笔记时使用的根目录',
+      allowedRootsDesc: '逗号分隔的根目录列表，新建笔记时会依次查找第一个在 vault 中存在的目录。',
+      templatePath: 'Templater 模板路径',
+      templatePathDesc:
+        '指向 Templater 模板文件的路径（如 Templates/jotting.md），留空则使用内置 frontmatter。',
       showPinButton: '显示置顶按钮',
       showAbandonButton: '显示放弃按钮',
       showDeleteButton: '显示删除按钮',
@@ -94,7 +97,7 @@ const MODULE_ID = 'brainattic-jotting-task';
 
 const DEFAULTS = {
   allowedRoots: ['personal', 'work'],
-  newJottingRoot: 'personal',
+  templatePath: '',
   showPinButton: true,
   showAbandonButton: true,
   showDeleteButton: true,
@@ -197,8 +200,42 @@ class JottingService {
     await this.app.vault.delete(task.file);
   }
 
+  // Return the first allowedRoot whose folder exists in the vault, or the first root as fallback.
+  _resolveRoot() {
+    const roots = this.cfg.allowedRoots ?? DEFAULTS.allowedRoots;
+    for (const r of roots) {
+      if (this.app.vault.getAbstractFileByPath(r)) return r;
+    }
+    return roots[0] ?? 'personal';
+  }
+
+  _getTemplater() {
+    const tp = this.app.plugins?.plugins?.['templater-obsidian'];
+    if (typeof tp?.templater?.create_new_note_from_template === 'function') return tp;
+    return null;
+  }
+
   async addTask(title) {
-    const root = this.cfg.newJottingRoot ?? DEFAULTS.newJottingRoot;
+    const root = this._resolveRoot();
+    const templatePath = this.cfg.templatePath?.trim();
+
+    if (templatePath) {
+      const templateFile = this.app.vault.getAbstractFileByPath(templatePath);
+      if (!(templateFile instanceof TFile)) {
+        new Notice(`Jotting Task: Template not found: ${templatePath}`);
+        return;
+      }
+      const templater = this._getTemplater();
+      if (!templater) {
+        new Notice('Jotting Task: Templater plugin is not enabled.');
+        return;
+      }
+      const folder = this.app.vault.getAbstractFileByPath(root) ?? this.app.vault.getRoot();
+      await templater.templater.create_new_note_from_template(templateFile, folder, title.trim());
+      return;
+    }
+
+    // No template — create with minimal frontmatter
     const dir = `${root}/${window.moment().format('YYYY/MM')}`;
     const path = `${dir}/${title.trim()}.md`;
 
@@ -460,13 +497,16 @@ const renderSettings = (containerEl, plugin, settings) => {
     );
 
   new Setting(containerEl)
-    .setName(t('settings.newJottingRoot'))
-    .setDesc(t('settings.newJottingRootDesc'))
+    .setName(t('settings.templatePath'))
+    .setDesc(t('settings.templatePathDesc'))
     .addText(text =>
-      text.setValue(cfg.newJottingRoot ?? DEFAULTS.newJottingRoot).onChange(async v => {
-        cfg.newJottingRoot = v.trim() || DEFAULTS.newJottingRoot;
-        await plugin.saveSettings();
-      })
+      text
+        .setPlaceholder('Templates/jotting.md')
+        .setValue(cfg.templatePath ?? DEFAULTS.templatePath)
+        .onChange(async v => {
+          cfg.templatePath = v.trim();
+          await plugin.saveSettings();
+        })
     );
 
   for (const [key, label] of [
