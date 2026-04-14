@@ -48,7 +48,7 @@ You can open the dashboard manually by pressing `Ctrl/Cmd + P` and running the `
 3. **Todo Modules**:
    - **Daily Todo**: Best for recurring habits (like taking pills or reading). It includes a simple crontab editor so you can define which days a task appears.
    - **Regular Todo**: Best for daily task lists. You can check off or abandon tasks right on the dashboard. The plugin updates the source file automatically.
-   - **Jotting Task** _(external plugin)_: Links TODO checkboxes to notes with `type: jotting`, keeping checkbox state and note frontmatter in sync. See `external-plugins/jotting-task.jsx`.
+   - **Jotting Task** _(example plugin)_: Queries notes with `type: jotting` directly via Obsidian's metadata cache, keeping checkbox state and note frontmatter in sync. See `examples/jotting-task.jsx`.
 4. **Recent Files**: Displays your recently modified or created notes in columns. You can add columns and set specific filter rules for each.
 5. **Random Note**: Shows a preview of a random past note. Good for reviewing old ideas.
 6. **Tmp Note**: A sticky scratchpad on your dashboard. Quick and easy for temporary text.

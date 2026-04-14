@@ -48,7 +48,7 @@
 3. **两种内置待办模块 (Todo)**:
    - **日常待办 (Daily Todo)**: 适合吃药、打卡等固定任务。支持简单的 crontab 语法，帮你设置每月的哪几天重复。
    - **常规待办 (Regular Todo)**: 每天独立生成的待办列表。你可以直接在面板上打勾或放弃，插件会自动修改源文件。
-   - **灵感任务 (Jotting Task)** _（外部插件）_：将 TODO checkbox 与 `type: jotting` 笔记关联，保持 checkbox 与笔记 frontmatter 状态同步。见 `external-plugins/jotting-task.jsx`。
+   - **灵感任务 (Jotting Task)** _（示例插件）_：直接通过 Obsidian metadataCache 查询 `type: jotting` 笔记并管理其状态，无需 TODO/ 文件。见 `examples/jotting-task.jsx`。
 4. **近期文档 (Recent Files)**: 分列显示你最近修改过的笔记。你可以按需增删列，或者设定每一列的具体过滤规则。
 5. **随机漫步 (Random Note)**: 随机抽出一篇老笔记给你看，帮你温故知新。
 6. **临时笔记 (Tmp Note)**: 一个常驻在面板上的快捷记录区，方便你随时写点东西。

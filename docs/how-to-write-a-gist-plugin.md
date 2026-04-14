@@ -208,7 +208,11 @@ The environment provides the following globals:
 - `require(id)`: Can require `"react"` or `"obsidian"`.
 - `module`, `exports`: CommonJS export mechanics.
 
-## 4. Key Differences from Compiled Plugins
+## 4. Real-World Example
+
+For a more complete example that uses `app.metadataCache`, `processFrontMatter`, debounced event listeners, and a multi-language UI, see [`examples/jotting-task.jsx`](../examples/jotting-task.jsx) in the repository.
+
+## 5. Key Differences from Compiled Plugins
 
 1.  **File Extension**: Use `.jsx` to enable JSX transformation.
 2.  **No Imports**: You cannot `import` other files or npm packages (unless they are shimmed).
