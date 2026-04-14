@@ -37,7 +37,6 @@ const RESOURCES = {
     cancel: 'Cancel',
     filter: { active: 'Active', done: 'Done', archive: 'Archived' },
     sort: {
-      default: 'Default',
       name: 'Name',
       modified: 'Modified',
       created: 'Created',
@@ -75,7 +74,6 @@ const RESOURCES = {
     cancel: '取消',
     filter: { active: '活跃', done: '已完成', archive: '已放弃' },
     sort: {
-      default: '默认',
       name: '名称',
       modified: '修改时间',
       created: '创建时间',
@@ -159,6 +157,8 @@ class JottingService {
             file: f,
             basename: f.basename,
             status: this._status(fm),
+            mtime: getFileMtime(this.app, f),
+            ctime: getFileCtime(this.app, f),
             fm,
           },
         ];
@@ -267,6 +267,26 @@ class JottingService {
     const file = await this.app.vault.create(path, content);
     this.app.workspace.openLinkText(file.basename, file.path);
   }
+}
+
+// ─── File time helpers (frontmatter-first, same as native getFileMtime/Ctime) ──
+
+function getFileMtime(app, file) {
+  const fm = app.metadataCache.getFileCache(file)?.frontmatter;
+  if (fm?.modified_date) {
+    const m = window.moment(fm.modified_date);
+    if (m.isValid()) return m.valueOf();
+  }
+  return file.stat.mtime;
+}
+
+function getFileCtime(app, file) {
+  const fm = app.metadataCache.getFileCache(file)?.frontmatter;
+  if (fm?.create_date) {
+    const m = window.moment(fm.create_date);
+    if (m.isValid()) return m.valueOf();
+  }
+  return file.stat.ctime;
 }
 
 // ─── Debounce ─────────────────────────────────────────────────────────────────
@@ -404,7 +424,7 @@ const JottingTaskModule = () => {
 
   const [tasks, setTasks] = useState([]);
   const [filters, setFilters] = useState(['active']);
-  const [sortBy, setSortBy] = useState('default');
+  const [sortBy, setSortBy] = useState('modified');
   const [sortOrder, setSortOrder] = useState('desc');
   const [isAdding, setIsAdding] = useState(false);
   const [addText, setAddText] = useState('');
@@ -423,7 +443,6 @@ const JottingTaskModule = () => {
   }, [load, debouncedLoad]);
 
   const visible = useMemo(() => {
-    const STATUS_PRIORITY = { pinned: 0, inbox: 1, done: 2, archive: 3 };
     const dir = sortOrder === 'asc' ? 1 : -1;
 
     return tasks
@@ -440,11 +459,12 @@ const JottingTaskModule = () => {
         const bPinned = b.status === 'pinned';
         if (aPinned !== bPinned) return aPinned ? -1 : 1;
 
-        if (sortBy === 'name') return dir * a.basename.localeCompare(b.basename);
-        if (sortBy === 'modified') return dir * (a.file.stat.mtime - b.file.stat.mtime);
-        if (sortBy === 'created') return dir * (a.file.stat.ctime - b.file.stat.ctime);
-        // default: status-priority order (inbox → done → archive)
-        return (STATUS_PRIORITY[a.status] ?? 9) - (STATUS_PRIORITY[b.status] ?? 9);
+        let comparison = 0;
+        if (sortBy === 'name') comparison = a.basename.localeCompare(b.basename);
+        else if (sortBy === 'created') comparison = a.ctime - b.ctime;
+        else comparison = a.mtime - b.mtime; // 'modified' (default)
+
+        return sortOrder === 'asc' ? comparison : -comparison;
       });
   }, [tasks, filters, sortBy, sortOrder]);
 
@@ -512,9 +532,8 @@ const JottingTaskModule = () => {
               color: 'var(--text-muted)',
             }}
           >
-            <option value="default">{t('sort.default')}</option>
-            <option value="name">{t('sort.name')}</option>
             <option value="modified">{t('sort.modified')}</option>
+            <option value="name">{t('sort.name')}</option>
             <option value="created">{t('sort.created')}</option>
           </select>
           <button
