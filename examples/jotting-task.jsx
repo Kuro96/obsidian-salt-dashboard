@@ -20,10 +20,10 @@ const { Notice, Setting, TFile } = Obsidian;
 
 const RESOURCES = {
   en: {
-    title: 'Jotting Tasks',
+    title: '✍️ Jotting Tasks',
     empty: 'No jotting tasks.',
     loading: 'Loading...',
-    addBtn: 'New jotting task',
+    addBtn: '+ Add Task',
     addPlaceholder: 'Task title...',
     add: 'Add',
     pin: 'Pin',
@@ -57,10 +57,10 @@ const RESOURCES = {
     },
   },
   zh: {
-    title: '灵感任务',
+    title: '✍️ 灵感任务',
     empty: '没有灵感任务。',
     loading: '加载中…',
-    addBtn: '新建灵感任务',
+    addBtn: '+ 添加任务',
     addPlaceholder: '任务标题…',
     add: '添加',
     pin: '置顶',
@@ -119,7 +119,151 @@ const DEFAULTS = {
   showPinButton: true,
   showAbandonButton: true,
   showDeleteButton: true,
+  statusFilters: ['active'],
+  sortBy: 'modified',
+  sortOrder: 'desc',
 };
+
+// ─── Lightweight shared-look controls ─────────────────────────────────────────
+
+function HeaderActionButton({ icon, className = '', children, ...props }) {
+  return (
+    <button className={`header-action-btn ${className}`.trim()} {...props}>
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+function MultiSelect({ options, selectedValues, onChange, label }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = event => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleOption = value => {
+    if (selectedValues.includes(value)) {
+      onChange(selectedValues.filter(v => v !== value));
+      return;
+    }
+    onChange([...selectedValues, value]);
+  };
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      <HeaderActionButton
+        className={isOpen ? 'multi-select-open' : ''}
+        onClick={() => setIsOpen(open => !open)}
+        title={label}
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+        }
+      />
+      {isOpen && (
+        <div
+          className="multi-select-dropdown"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            right: 0,
+            marginTop: '4px',
+            backgroundColor: 'var(--background-primary)',
+            border: '1px solid var(--background-modifier-border)',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            zIndex: 1000,
+            minWidth: '140px',
+            padding: '4px 0',
+            textAlign: 'left',
+            cursor: 'default',
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          {options.map(option => (
+            <label
+              key={option.value}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '6px 12px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                color: 'var(--text-normal)',
+                gap: '8px',
+              }}
+              onMouseEnter={e =>
+                (e.currentTarget.style.backgroundColor = 'var(--background-modifier-hover)')
+              }
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <input
+                type="checkbox"
+                checked={selectedValues.includes(option.value)}
+                onChange={() => toggleOption(option.value)}
+                style={{ margin: 0 }}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SortControls({ sortBy, sortOrder, onSortChange, onOrderChange, options }) {
+  return (
+    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+      <select
+        className="rf-control-select"
+        value={sortBy}
+        onChange={e => onSortChange(e.target.value)}
+        style={{
+          padding: '0 4px',
+          fontSize: '11px',
+          height: '24px',
+          borderRadius: '4px',
+          border: '1px solid var(--background-modifier-border)',
+          background: 'var(--background-primary)',
+          color: 'var(--text-muted)',
+        }}
+      >
+        {options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+
+      <HeaderActionButton
+        onClick={() => onOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')}
+        title={sortOrder === 'asc' ? t('sort.ascending') : t('sort.descending')}
+        icon={sortOrder === 'asc' ? '↑' : '↓'}
+      />
+    </div>
+  );
+}
 
 // ─── Service ──────────────────────────────────────────────────────────────────
 
@@ -412,23 +556,34 @@ function TaskItem({ task, cfg, svc, onRefresh }) {
 const FILTER_OPTIONS = ['active', 'done', 'archive'];
 
 const JottingTaskModule = () => {
+  const plugin = useMemo(() => app.plugins?.getPlugin?.('salt-dashboard') ?? null, []);
   const cfg = useMemo(() => {
     try {
-      return app.plugins?.getPlugin?.('salt-dashboard')?.settings?.[MODULE_ID] ?? DEFAULTS;
+      return plugin?.settings?.[MODULE_ID] ?? DEFAULTS;
     } catch {
       return DEFAULTS;
     }
-  }, []);
+  }, [plugin]);
 
   const svc = useMemo(() => new JottingService(app, cfg), [cfg]);
 
   const [tasks, setTasks] = useState([]);
-  const [filters, setFilters] = useState(['active']);
-  const [sortBy, setSortBy] = useState('modified');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [filters, setFilters] = useState(cfg.statusFilters ?? DEFAULTS.statusFilters);
+  const [sortBy, setSortBy] = useState(cfg.sortBy ?? DEFAULTS.sortBy);
+  const [sortOrder, setSortOrder] = useState(cfg.sortOrder ?? DEFAULTS.sortOrder);
   const [isAdding, setIsAdding] = useState(false);
   const [addText, setAddText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const persistConfig = useCallback(
+    async patch => {
+      if (!plugin) return;
+      const current = plugin.settings?.[MODULE_ID] ?? { ...DEFAULTS };
+      plugin.settings[MODULE_ID] = { ...current, ...patch };
+      await plugin.saveSettings();
+    },
+    [plugin]
+  );
 
   const load = useCallback(() => {
     setTasks(svc.fetchTasks());
@@ -468,8 +623,29 @@ const JottingTaskModule = () => {
       });
   }, [tasks, filters, sortBy, sortOrder]);
 
-  const toggleFilter = v =>
-    setFilters(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
+  const updateFilters = useCallback(
+    async nextFilters => {
+      setFilters(nextFilters);
+      await persistConfig({ statusFilters: nextFilters });
+    },
+    [persistConfig]
+  );
+
+  const updateSortBy = useCallback(
+    async nextSortBy => {
+      setSortBy(nextSortBy);
+      await persistConfig({ sortBy: nextSortBy });
+    },
+    [persistConfig]
+  );
+
+  const updateSortOrder = useCallback(
+    async nextSortOrder => {
+      setSortOrder(nextSortOrder);
+      await persistConfig({ sortOrder: nextSortOrder });
+    },
+    [persistConfig]
+  );
 
   const handleAdd = async () => {
     if (!addText.trim() || submitting) return;
@@ -488,62 +664,30 @@ const JottingTaskModule = () => {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Filter chips + sort controls */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '6px',
-          gap: '4px',
-        }}
-      >
-        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-          {FILTER_OPTIONS.map(v => (
-            <button
-              key={v}
-              onClick={() => toggleFilter(v)}
-              style={{
-                fontSize: '0.75em',
-                padding: '1px 8px',
-                borderRadius: '10px',
-                border: '1px solid var(--color-accent)',
-                cursor: 'pointer',
-                background: filters.includes(v) ? 'var(--color-accent)' : 'transparent',
-                color: filters.includes(v) ? 'var(--text-on-accent)' : 'var(--color-accent)',
-              }}
-            >
-              {t('filter.' + v)}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
-          <select
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            style={{
-              padding: '0 4px',
-              fontSize: '11px',
-              height: '24px',
-              borderRadius: '4px',
-              border: '1px solid var(--background-modifier-border)',
-              background: 'var(--background-primary)',
-              color: 'var(--text-muted)',
-            }}
-          >
-            <option value="modified">{t('sort.modified')}</option>
-            <option value="name">{t('sort.name')}</option>
-            <option value="created">{t('sort.created')}</option>
-          </select>
-          <button
-            className="header-action-btn"
-            onClick={() => setSortOrder(o => (o === 'asc' ? 'desc' : 'asc'))}
-            title={sortOrder === 'asc' ? t('sort.ascending') : t('sort.descending')}
-          >
-            {sortOrder === 'asc' ? '↑' : '↓'}
-          </button>
-        </div>
+      <div className="module-header-actions">
+        <MultiSelect
+          label={getLocale() === 'zh' ? '筛选' : 'Filter'}
+          options={FILTER_OPTIONS.map(value => ({ label: t(`filter.${value}`), value }))}
+          selectedValues={filters}
+          onChange={values => {
+            void updateFilters(values);
+          }}
+        />
+        <SortControls
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortChange={value => {
+            void updateSortBy(value);
+          }}
+          onOrderChange={value => {
+            void updateSortOrder(value);
+          }}
+          options={[
+            { label: t('sort.modified'), value: 'modified' },
+            { label: t('sort.name'), value: 'name' },
+            { label: t('sort.created'), value: 'created' },
+          ]}
+        />
       </div>
 
       {/* Scrollable task list */}
