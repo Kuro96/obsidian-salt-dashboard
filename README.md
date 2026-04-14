@@ -130,3 +130,23 @@ module.exports = {
 ```
 
 After writing this, click the reload button in the dashboard settings. You can now add and see your custom weather card on the grid.
+
+### DOs and DON'Ts for Custom Plugins
+
+This project supports external plugins as lightweight single-file modules. They are intended to be visually compatible with the dashboard, not deeply coupled to internal runtime APIs.
+
+**DOs**
+
+- Do use Obsidian theme variables such as `var(--background-primary)` and `var(--text-muted)` so your module matches the host theme.
+- Do reuse stable public CSS class names when you only want your UI to look consistent with built-in modules, for example `module-header-actions`, `header-action-btn`, `rf-control-select`, and task-list-related classes.
+- Do keep custom plugins self-contained in a single `.js` / `.jsx` / `.cjs` file.
+- Do persist your own filter and sort settings through the main plugin settings object if you want behavior similar to built-in modules.
+- Do treat built-in module source code as reference material, not as an importable runtime library.
+
+**DON'Ts**
+
+- Don't import internal TypeScript source files from `src/`; custom plugins are not a supported extension point for internal module code.
+- Don't depend on undocumented runtime injection beyond the currently supported globals: `React`, `Obsidian`, `require('react')`, and `require('obsidian')`.
+- Don't assume built-in React components, hooks, services, or helpers will be exposed to custom plugins.
+- Don't design custom plugins around future `PluginLoader` runtime injection. The project does not plan to add shared runtime component/helper injection for external modules.
+- Don't treat visual similarity as API compatibility; matching class names and styling is allowed, but internal behavior and implementation details may change.
