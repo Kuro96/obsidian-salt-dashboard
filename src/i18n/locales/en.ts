@@ -134,11 +134,6 @@ export default {
           future: "Non-Today's Tasks",
         },
       },
-      jottings: {
-        title: '✍️ Jottings Tasks',
-        empty: 'No jottings tasks found.',
-        placeholder: 'Add task',
-      },
       regular: {
         title: '📝 Regular Tasks',
         empty: 'No pending regular tasks.',

@@ -134,11 +134,6 @@ export default {
           future: '非今日待办',
         },
       },
-      jottings: {
-        title: '✍️ 随手记',
-        empty: '未找到随手记任务。',
-        placeholder: '添加任务',
-      },
       regular: {
         title: '📝 常规待办',
         empty: '没有待处理的常规任务。',

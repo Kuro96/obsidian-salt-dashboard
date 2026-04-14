@@ -101,9 +101,17 @@ export class PluginLoader {
       };
 
       // Wrap in function to execute
-      const wrapper = new Function('module', 'exports', 'require', 'React', 'Obsidian', content);
+      const wrapper = new Function(
+        'module',
+        'exports',
+        'require',
+        'React',
+        'Obsidian',
+        'app',
+        content
+      );
 
-      wrapper(module, exports, requireShim, React, Obsidian);
+      wrapper(module, exports, requireShim, React, Obsidian, this.app);
 
       // Expect module.exports to be the DashboardModule object
       // or module.exports.default

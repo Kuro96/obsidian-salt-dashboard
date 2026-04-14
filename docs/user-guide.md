@@ -23,7 +23,7 @@ Salt Dashboard uses a responsive 12-column grid layout:
 
 At the top of the plugin settings page, you will find the general settings:
 
-- **TODO Source Folder**: Defines the folder where all your task files (Daily/Regular/Jottings) are stored (e.g., `TODO`).
+- **TODO Source Folder**: Defines the folder where all your task files (Daily/Regular) are stored (e.g., `TODO`).
 - **Global Filter**: Used to exclude specific folders in modules like "Recent Files" and "Random Note". It uses a Dataview-style query, such as: `(-"SCRIPTS") and (-"Templates")`, to avoid fetching irrelevant files.
 
 ---
@@ -50,11 +50,11 @@ A GitHub-style annual heatmap showing your task completion status.
     - `modal`: Opens a popup showing all task details for that day.
     - `jump`: Jumps directly to the source file of the tasks.
     - `filter`: Filters the current Todo module to show only tasks from that day.
-  - `Data Sources`: You can select which data sources this graph should track (Daily/Regular/Jottings).
+  - `Data Sources`: You can select which data sources this graph should track (Daily/Regular).
 
 ### 3.3 Todo Management Modules
 
-Salt provides three different types of Todo modules to meet various task management needs:
+Salt provides two built-in Todo modules. A third module for jotting-style tasks (linking TODO checkboxes to notes with `type: jotting`) is available as an external plugin (`brainattic-jotting-task`).
 
 **① Daily Todo**
 
@@ -67,13 +67,6 @@ Salt provides three different types of Todo modules to meet various task managem
 - Best for independent, day-by-day task planning (e.g., automatically creating a `260302.md` file every day to store that day's miscellaneous tasks).
 - You can check off or abandon tasks directly in the module, and it will automatically modify the source file content.
 - **Settings**: Set the naming format for date files (default `YYMMDD`), and choose whether to **automatically create a file** if today's file doesn't exist.
-
-**③ Jottings Todo**
-
-- Best for tasks generated while reading or jotting down notes. When a task contains a link pointing to a specific folder (like `[[jottings/idea]]`), it will automatically be captured by this module.
-- **Settings**:
-  - Set the target folder for Jottings.
-  - Set tags to automatically append to the source file when a task is marked as complete (`doneTag`) or abandoned (`abandonedTag`) (e.g., `#jottings/done`).
 
 ### 3.4 Recent Files
 

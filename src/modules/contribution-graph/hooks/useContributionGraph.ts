@@ -44,7 +44,7 @@ export const useContributionGraph = () => {
     };
 
     // Listen to changes
-    // We listen to all markdown files because tasks can be in Daily Notes, Jottings, or Todo folder
+    // We listen to all markdown files because tasks can be in Daily Notes or Todo folder
     const ref = app.vault.on('modify', handleModify);
 
     return () => {

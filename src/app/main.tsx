@@ -86,7 +86,19 @@ export default class HomepagePlugin extends Plugin {
   async loadSettings() {
     // Merge core defaults, module defaults, and user data
     const moduleDefaults = registry.getAllDefaultSettings();
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, moduleDefaults, await this.loadData());
+    const saved = (await this.loadData()) as Record<string, unknown>;
+
+    // ── Migration: remove jottings-todo (extracted to external plugin) ──────
+    if (saved) {
+      delete saved['jottingsTodo'];
+      const layout = saved['layout'] as { modules?: { id: string }[] } | undefined;
+      if (layout?.modules) {
+        layout.modules = layout.modules.filter((m: { id: string }) => m.id !== 'jottings-todo');
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, moduleDefaults, saved);
 
     // Apply language setting
     if (this.settings.language && this.settings.language !== 'system') {

@@ -138,7 +138,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
     modifiedDateProperty: 'modified_date',
     columns: [
       { id: 'notes', title: '📝 Notes', source: '"notes" or "works/notes"' },
-      { id: 'jottings', title: '✍️ Jottings', source: '"jottings"' },
       { id: 'clippings', title: '📚 Clippings', source: '"clippings" or "works/clippings"' },
       { id: 'tasks', title: '✅ Tasks', source: '"works/tasks"' },
     ],

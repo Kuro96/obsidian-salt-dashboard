@@ -39,7 +39,6 @@ src/
 │   └── todo/                   # [Domain] Todo Management
 │       ├── daily/              # [Module] Daily Todo
 │       ├── regular/            # [Module] Regular Todo
-│       ├── jottings/           # [Module] Jottings Todo
 │       ├── shared/             # Shared Todo Logic
 │       └── styles.css          # Shared Todo Styles
 │

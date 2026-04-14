@@ -133,7 +133,6 @@ export class DailyTodoService extends TodoBaseService {
       isAbandoned: false,
       isPinned: false,
       isDaily: true,
-      isJottings: false,
       sourceFile: null,
       sourcePath: '',
       lineNumber: -1,

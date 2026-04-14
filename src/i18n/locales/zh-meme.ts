@@ -134,11 +134,6 @@ export default {
           future: '非今天的任务',
         },
       },
-      jottings: {
-        title: '✍️ 乱写的任务',
-        empty: '没有乱写的任务被找到。',
-        placeholder: '增加任务',
-      },
       regular: {
         title: '📝 规律的任务',
         empty: '没有悬挂的规律的任务。',

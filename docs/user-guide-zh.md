@@ -23,7 +23,7 @@ Salt Dashboard 采用响应式 12 列网格布局：
 
 在插件设置页的顶部，您可以找到全局设置：
 
-- **TODO Source Folder (待办数据源文件夹)**: 定义所有的待办事项 (Daily/Regular/Jottings) 存放在哪个文件夹（例如 `TODO`）。
+- **TODO Source Folder (待办数据源文件夹)**: 定义所有的待办事项 (Daily/Regular) 存放在哪个文件夹（例如 `TODO`）。
 - **Global Filter (全局过滤器)**: 用于在“近期文档”和“随机笔记”等模块中排除特定文件夹。采用 Dataview 风格查询，如：`(-"SCRIPTS") and (-"Templates")`，避免抓取到不相干的文件。
 
 ---
@@ -50,11 +50,11 @@ GitHub 风格的年度热力图，展示您的任务完成情况。
     - `modal`: 弹窗显示当天的所有任务详情。
     - `jump`: 直接跳转到对应的任务源文件。
     - `filter`: 在当前的 Todo 模块中筛选出那一天的任务。
-  - `Data Sources`: 您可以勾选此图表统计哪些来源的数据（日常待办/常规待办/随手记）。
+  - `Data Sources`: 您可以勾选此图表统计哪些来源的数据（日常待办/常规待办）。
 
 ### 3.3 Todo 管理系列模块
 
-Salt 提供三种不同形式的 Todo 模块，满足各类任务管理需求：
+Salt 提供两种内置 Todo 模块。第三种模块（将 TODO checkbox 与 `type: jotting` 笔记关联的灵感任务）作为外部插件提供（`brainattic-jotting-task`）。
 
 **① Daily Todo (日常待办)**
 
@@ -67,13 +67,6 @@ Salt 提供三种不同形式的 Todo 模块，满足各类任务管理需求：
 - 适合按天独立的任务规划（例如每天自动创建一个 `260302.md` 用于存放当天的琐碎任务）。
 - 模块里可以直接打勾或放弃，自动修改源文件内容。
 - **配置项**: 设置日期文件的命名格式（默认 `YYMMDD`），以及是否在没有今日文件时**自动创建文件**。
-
-**③ Jottings Todo (随手记待办)**
-
-- 适合阅读或随手记录时产生的待办事项。当任务内容包含指向特定文件夹（如 `[[jottings/idea]]`）的链接时会自动被此模块抓取。
-- **配置项**:
-  - 设定 Jottings 的目标文件夹。
-  - 设置完成 (`doneTag`) 和放弃 (`abandonedTag`) 时，为对应源文件自动添加的标签（如 `#jottings/done`）。
 
 ### 3.4 Recent Files (近期文档)
 
