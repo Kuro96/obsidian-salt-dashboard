@@ -23,7 +23,8 @@ const RESOURCES = {
     title: 'Jotting Tasks',
     empty: 'No jotting tasks.',
     loading: 'Loading...',
-    addPlaceholder: 'New jotting title...',
+    addBtn: 'New jotting task',
+    addPlaceholder: 'Task title...',
     add: 'Add',
     pin: 'Pin',
     unpin: 'Unpin',
@@ -31,14 +32,23 @@ const RESOURCES = {
     uncomplete: 'Mark incomplete',
     abandon: 'Abandon',
     restore: 'Restore',
-    delete: 'Delete note',
-    deleteConfirm: 'Delete this jotting note permanently?',
+    delete: 'Delete task',
+    confirmDelete: 'Confirm delete',
+    cancel: 'Cancel',
     filter: { active: 'Active', done: 'Done', archive: 'Archived' },
+    sort: {
+      default: 'Default',
+      name: 'Name',
+      modified: 'Modified',
+      created: 'Created',
+      ascending: 'Ascending',
+      descending: 'Descending',
+    },
     settings: {
       heading: 'Jotting Task Settings',
       allowedRoots: 'Allowed root folders',
       allowedRootsDesc:
-        'Comma-separated list of roots to scan. New notes are created in the first root that exists in the vault.',
+        'Comma-separated list of roots to scan. New tasks are created in the first root that exists in the vault.',
       templatePath: 'Templater template path',
       templatePathDesc:
         'Path to a Templater template file (e.g. Templates/jotting.md). Leave blank to use the built-in frontmatter.',
@@ -51,7 +61,8 @@ const RESOURCES = {
     title: '灵感任务',
     empty: '没有灵感任务。',
     loading: '加载中…',
-    addPlaceholder: '新灵感笔记标题…',
+    addBtn: '新建灵感任务',
+    addPlaceholder: '任务标题…',
     add: '添加',
     pin: '置顶',
     unpin: '取消置顶',
@@ -59,13 +70,22 @@ const RESOURCES = {
     uncomplete: '标为未完成',
     abandon: '放弃',
     restore: '恢复',
-    delete: '删除笔记',
-    deleteConfirm: '确认永久删除这篇灵感笔记？',
+    delete: '删除任务',
+    confirmDelete: '确认删除',
+    cancel: '取消',
     filter: { active: '活跃', done: '已完成', archive: '已放弃' },
+    sort: {
+      default: '默认',
+      name: '名称',
+      modified: '修改时间',
+      created: '创建时间',
+      ascending: '升序',
+      descending: '降序',
+    },
     settings: {
       heading: '灵感任务设置',
       allowedRoots: '允许的根目录',
-      allowedRootsDesc: '逗号分隔的根目录列表，新建笔记时会依次查找第一个在 vault 中存在的目录。',
+      allowedRootsDesc: '逗号分隔的根目录列表，新建任务时会依次查找第一个在 vault 中存在的目录。',
       templatePath: 'Templater 模板路径',
       templatePathDesc:
         '指向 Templater 模板文件的路径（如 Templates/jotting.md），留空则使用内置 frontmatter。',
@@ -265,6 +285,7 @@ function TaskItem({ task, cfg, svc, onRefresh }) {
   const isDone = task.status === 'done';
   const isArchive = task.status === 'archive';
   const isPinned = task.status === 'pinned';
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const act = async fn => {
     try {
@@ -297,41 +318,69 @@ function TaskItem({ task, cfg, svc, onRefresh }) {
       </span>
 
       <div className="actions">
-        {cfg.showPinButton && !isDone && !isArchive && (
-          <button
-            className={`shared-item-action-btn${isPinned ? ' pinned' : ''}`}
-            onClick={e => {
-              e.stopPropagation();
-              act(() => svc.togglePin(task));
-            }}
-            title={isPinned ? t('unpin') : t('pin')}
-          >
-            {isPinned ? '📌' : '📍'}
-          </button>
-        )}
-        {cfg.showAbandonButton && !isDone && (
-          <button
-            className="shared-item-action-btn abandon-btn"
-            onClick={e => {
-              e.stopPropagation();
-              act(() => svc.toggleAbandon(task));
-            }}
-            title={isArchive ? t('restore') : t('abandon')}
-          >
-            {isArchive ? '↩️' : '❌'}
-          </button>
-        )}
-        {cfg.showDeleteButton && (
-          <button
-            className="shared-item-action-btn delete-btn"
-            onClick={e => {
-              e.stopPropagation();
-              if (confirm(t('deleteConfirm'))) act(() => svc.deleteTask(task));
-            }}
-            title={t('delete')}
-          >
-            🗑️
-          </button>
+        {isDeleting ? (
+          <>
+            <button
+              className="shared-item-action-btn confirm-delete"
+              onClick={e => {
+                e.stopPropagation();
+                act(() => svc.deleteTask(task));
+                setIsDeleting(false);
+              }}
+              title={t('confirmDelete')}
+            >
+              ✓
+            </button>
+            <button
+              className="shared-item-action-btn cancel-btn"
+              onClick={e => {
+                e.stopPropagation();
+                setIsDeleting(false);
+              }}
+              title={t('cancel')}
+            >
+              ✗
+            </button>
+          </>
+        ) : (
+          <>
+            {cfg.showPinButton && !isDone && !isArchive && (
+              <button
+                className={`shared-item-action-btn${isPinned ? ' pinned' : ''}`}
+                onClick={e => {
+                  e.stopPropagation();
+                  act(() => svc.togglePin(task));
+                }}
+                title={isPinned ? t('unpin') : t('pin')}
+              >
+                {isPinned ? '📌' : '📍'}
+              </button>
+            )}
+            {cfg.showAbandonButton && !isDone && (
+              <button
+                className="shared-item-action-btn abandon-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  act(() => svc.toggleAbandon(task));
+                }}
+                title={isArchive ? t('restore') : t('abandon')}
+              >
+                {isArchive ? '↩️' : '❌'}
+              </button>
+            )}
+            {cfg.showDeleteButton && (
+              <button
+                className="shared-item-action-btn delete-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  setIsDeleting(true);
+                }}
+                title={t('delete')}
+              >
+                🗑️
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -355,6 +404,8 @@ const JottingTaskModule = () => {
 
   const [tasks, setTasks] = useState([]);
   const [filters, setFilters] = useState(['active']);
+  const [sortBy, setSortBy] = useState('default');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [isAdding, setIsAdding] = useState(false);
   const [addText, setAddText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -373,6 +424,8 @@ const JottingTaskModule = () => {
 
   const visible = useMemo(() => {
     const STATUS_PRIORITY = { pinned: 0, inbox: 1, done: 2, archive: 3 };
+    const dir = sortOrder === 'asc' ? 1 : -1;
+
     return tasks
       .filter(task => {
         if (filters.includes('active') && (task.status === 'inbox' || task.status === 'pinned'))
@@ -381,8 +434,19 @@ const JottingTaskModule = () => {
         if (filters.includes('archive') && task.status === 'archive') return true;
         return false;
       })
-      .sort((a, b) => (STATUS_PRIORITY[a.status] ?? 9) - (STATUS_PRIORITY[b.status] ?? 9));
-  }, [tasks, filters]);
+      .sort((a, b) => {
+        // Pinned always floats to top regardless of sort mode
+        const aPinned = a.status === 'pinned';
+        const bPinned = b.status === 'pinned';
+        if (aPinned !== bPinned) return aPinned ? -1 : 1;
+
+        if (sortBy === 'name') return dir * a.basename.localeCompare(b.basename);
+        if (sortBy === 'modified') return dir * (a.file.stat.mtime - b.file.stat.mtime);
+        if (sortBy === 'created') return dir * (a.file.stat.ctime - b.file.stat.ctime);
+        // default: status-priority order (inbox → done → archive)
+        return (STATUS_PRIORITY[a.status] ?? 9) - (STATUS_PRIORITY[b.status] ?? 9);
+      });
+  }, [tasks, filters, sortBy, sortOrder]);
 
   const toggleFilter = v =>
     setFilters(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
@@ -404,25 +468,63 @@ const JottingTaskModule = () => {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Filter chips */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '6px', flexWrap: 'wrap' }}>
-        {FILTER_OPTIONS.map(v => (
-          <button
-            key={v}
-            onClick={() => toggleFilter(v)}
+      {/* Filter chips + sort controls */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '6px',
+          gap: '4px',
+        }}
+      >
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+          {FILTER_OPTIONS.map(v => (
+            <button
+              key={v}
+              onClick={() => toggleFilter(v)}
+              style={{
+                fontSize: '0.75em',
+                padding: '1px 8px',
+                borderRadius: '10px',
+                border: '1px solid var(--color-accent)',
+                cursor: 'pointer',
+                background: filters.includes(v) ? 'var(--color-accent)' : 'transparent',
+                color: filters.includes(v) ? 'var(--text-on-accent)' : 'var(--color-accent)',
+              }}
+            >
+              {t('filter.' + v)}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value)}
             style={{
-              fontSize: '0.75em',
-              padding: '1px 8px',
-              borderRadius: '10px',
-              border: '1px solid var(--color-accent)',
-              cursor: 'pointer',
-              background: filters.includes(v) ? 'var(--color-accent)' : 'transparent',
-              color: filters.includes(v) ? 'var(--text-on-accent)' : 'var(--color-accent)',
+              padding: '0 4px',
+              fontSize: '11px',
+              height: '24px',
+              borderRadius: '4px',
+              border: '1px solid var(--background-modifier-border)',
+              background: 'var(--background-primary)',
+              color: 'var(--text-muted)',
             }}
           >
-            {t('filter.' + v)}
+            <option value="default">{t('sort.default')}</option>
+            <option value="name">{t('sort.name')}</option>
+            <option value="modified">{t('sort.modified')}</option>
+            <option value="created">{t('sort.created')}</option>
+          </select>
+          <button
+            className="header-action-btn"
+            onClick={() => setSortOrder(o => (o === 'asc' ? 'desc' : 'asc'))}
+            title={sortOrder === 'asc' ? t('sort.ascending') : t('sort.descending')}
+          >
+            {sortOrder === 'asc' ? '↑' : '↓'}
           </button>
-        ))}
+        </div>
       </div>
 
       {/* Scrollable task list */}
@@ -440,7 +542,7 @@ const JottingTaskModule = () => {
       <div className="add-task-container">
         {!isAdding ? (
           <button className="add-task-btn" onClick={() => setIsAdding(true)}>
-            {t('addPlaceholder')}
+            {t('addBtn')}
           </button>
         ) : (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
