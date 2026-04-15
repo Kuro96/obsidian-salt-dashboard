@@ -31,11 +31,10 @@ export class RegularTodoService extends TodoBaseService {
 
       lines.forEach((line, index) => {
         const trimmed = line.trim();
-        const match = trimmed.match(/^- \[(.)\] (.*)$/);
+        const match = this.parseTaskLine(trimmed);
 
         if (match) {
-          const statusChar = match[1];
-          const text = match[2];
+          const { statusChar, text } = match;
 
           const isCompleted = statusChar === 'x';
           const isAbandoned = statusChar === '-';
@@ -124,7 +123,7 @@ export class RegularTodoService extends TodoBaseService {
   async updateTask(task: Task, newText: string): Promise<void> {
     await this.modifyTaskFile(task, (lines, idx) => {
       const line = lines[idx];
-      const match = line.match(/^(- \[[ x!-]\s?\] )(.*)$/);
+      const match = line.match(/^(\s*- \[[^\]]\]\s+)(.*)$/);
       if (match) {
         lines[idx] = `${match[1]}${newText}`;
       }
@@ -135,13 +134,16 @@ export class RegularTodoService extends TodoBaseService {
     await this.modifyTaskFile(task, (lines, idx) => {
       const line = lines[idx];
       const today = moment().format('YYYY-MM-DD');
+      const parsed = this.parseTaskLine(line);
+      if (!parsed) return false;
 
-      if (line.includes('- [ ]')) {
-        lines[idx] = line.replace('- [ ]', '- [x]') + ` ✅ ${today}`;
-      } else if (line.includes('- [!]')) {
-        lines[idx] = line.replace('- [!]', '- [x]') + ` ✅ ${today}`;
-      } else if (line.includes('- [x]')) {
-        lines[idx] = line.replace('- [x]', '- [ ]').replace(/ ✅ \d{4}-\d{2}-\d{2}/, '');
+      const statusKind = this.getTaskStatusKind(parsed.statusChar);
+      const cleanedLine = this.stripTaskDateMarkers(line);
+
+      if (statusKind === 'completed') {
+        lines[idx] = this.replaceTaskStatus(cleanedLine, ' ');
+      } else if (statusKind !== 'abandoned') {
+        lines[idx] = `${this.replaceTaskStatus(cleanedLine, 'x')} ✅ ${today}`;
       }
     });
   }
@@ -149,10 +151,14 @@ export class RegularTodoService extends TodoBaseService {
   async togglePin(task: Task): Promise<void> {
     await this.modifyTaskFile(task, (lines, idx) => {
       const line = lines[idx];
-      if (line.includes('- [ ]')) {
-        lines[idx] = line.replace('- [ ]', '- [!]');
-      } else if (line.includes('- [!]')) {
-        lines[idx] = line.replace('- [!]', '- [ ]');
+      const parsed = this.parseTaskLine(line);
+      if (!parsed) return false;
+
+      const statusKind = this.getTaskStatusKind(parsed.statusChar);
+      if (statusKind === 'pinned') {
+        lines[idx] = this.replaceTaskStatus(line, ' ');
+      } else if (statusKind === 'active') {
+        lines[idx] = this.replaceTaskStatus(line, '!');
       }
     });
   }
@@ -161,12 +167,16 @@ export class RegularTodoService extends TodoBaseService {
     await this.modifyTaskFile(task, (lines, idx) => {
       const line = lines[idx];
       const today = moment().format('YYYY-MM-DD');
+      const parsed = this.parseTaskLine(line);
+      if (!parsed) return false;
 
-      // Use stricter matching to avoid partial matches
-      if (/^- \[[ !]\]/.test(line)) {
-        lines[idx] = line.replace(/^- \[[ !]\]/, '- [-]') + ` ❌ ${today}`;
-      } else if (/^- \[-]/.test(line)) {
-        lines[idx] = line.replace(/^- \[-]/, '- [ ]').replace(/ ❌ \d{4}-\d{2}-\d{2}/, '');
+      const statusKind = this.getTaskStatusKind(parsed.statusChar);
+      const cleanedLine = this.stripTaskDateMarkers(line);
+
+      if (statusKind === 'abandoned') {
+        lines[idx] = this.replaceTaskStatus(cleanedLine, ' ');
+      } else if (statusKind !== 'completed') {
+        lines[idx] = `${this.replaceTaskStatus(cleanedLine, '-')} ❌ ${today}`;
       }
     });
   }

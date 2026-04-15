@@ -31,11 +31,11 @@ export class DailyTodoService extends TodoBaseService {
 
     lines.forEach((line, index) => {
       const trimmed = line.trim();
-      const match = trimmed.match(/^- \[(.)\] (.*)$/);
+      const match = this.parseTaskLine(trimmed);
 
       if (match) {
-        const statusChar = match[1];
-        let text = match[2];
+        const { statusChar } = match;
+        let text = match.text;
         let crontabExpr = null;
 
         if (this.config.enableCrontab) {
@@ -155,7 +155,7 @@ export class DailyTodoService extends TodoBaseService {
   async updateTask(task: Task, newText: string): Promise<void> {
     await this.modifyTaskFile(task, (lines, idx) => {
       const line = lines[idx];
-      const match = line.match(/^(- \[[ x!-]\s?\] )(.*)$/);
+      const match = line.match(/^(\s*- \[[^\]]\]\s+)(.*)$/);
       if (match) {
         // We need to preserve the crontab if it exists in the original line?
         // Or does 'newText' come from the UI which might have modified crontab?
@@ -205,10 +205,14 @@ export class DailyTodoService extends TodoBaseService {
   async togglePin(task: Task): Promise<void> {
     await this.modifyTaskFile(task, (lines, idx) => {
       const line = lines[idx];
-      if (line.includes('- [ ]')) {
-        lines[idx] = line.replace('- [ ]', '- [!]');
-      } else if (line.includes('- [!]')) {
-        lines[idx] = line.replace('- [!]', '- [ ]');
+      const parsed = this.parseTaskLine(line);
+      if (!parsed) return false;
+
+      const statusKind = this.getTaskStatusKind(parsed.statusChar);
+      if (statusKind === 'pinned') {
+        lines[idx] = this.replaceTaskStatus(line, ' ');
+      } else if (statusKind === 'active') {
+        lines[idx] = this.replaceTaskStatus(line, '!');
       }
     });
   }

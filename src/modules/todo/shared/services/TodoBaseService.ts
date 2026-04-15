@@ -6,6 +6,8 @@ export abstract class TodoBaseService {
   protected app: App;
   protected config: TodoModuleConfig;
 
+  protected static readonly TASK_LINE_PATTERN = /^(\s*- \[)(.)\](\s+)(.*)$/;
+
   constructor(app: App, config: TodoModuleConfig) {
     this.app = app;
     this.config = config;
@@ -77,6 +79,31 @@ export abstract class TodoBaseService {
 
       return sortOrder === 'asc' ? comparison : -comparison;
     });
+  }
+
+  protected parseTaskLine(line: string): { statusChar: string; text: string } | null {
+    const match = line.match(TodoBaseService.TASK_LINE_PATTERN);
+    if (!match) return null;
+
+    return {
+      statusChar: match[2],
+      text: match[4],
+    };
+  }
+
+  protected getTaskStatusKind(statusChar: string): 'active' | 'pinned' | 'completed' | 'abandoned' {
+    if (statusChar === 'x') return 'completed';
+    if (statusChar === '-') return 'abandoned';
+    if (statusChar === '!') return 'pinned';
+    return 'active';
+  }
+
+  protected replaceTaskStatus(line: string, statusChar: string): string {
+    return line.replace(TodoBaseService.TASK_LINE_PATTERN, `$1${statusChar}]$3$4`);
+  }
+
+  protected stripTaskDateMarkers(line: string): string {
+    return line.replace(/ (?:✅|❌) \d{4}-\d{2}-\d{2}/g, '');
   }
 
   // Helper for modifying task lines in files
