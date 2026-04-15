@@ -197,9 +197,10 @@ export class HomepageSettingTab extends PluginSettingTab {
     allRegistered.forEach(mod => {
       const layoutItem = this.plugin.settings.layout.modules.find(m => m.id === mod.id);
       const isEnabled = layoutItem ? layoutItem.enabled : false;
+      const settingsTitle = mod.settingsTitle ?? mod.title;
 
       new Setting(activeModulesContainer)
-        .setName(mod.title)
+        .setName(settingsTitle)
         .setDesc(mod.id)
         .addToggle(toggle =>
           toggle.setValue(isEnabled).onChange(async val => {
@@ -233,9 +234,11 @@ export class HomepageSettingTab extends PluginSettingTab {
         module.renderSettings(containerEl, this.plugin, this.plugin.settings);
       } catch (e) {
         console.error(`Error rendering settings for module ${module.id}:`, e);
-        containerEl
-          .createDiv()
-          .setText(i18n.t('settings.activeModules.errorLoading', { title: module.title }));
+        containerEl.createDiv().setText(
+          i18n.t('settings.activeModules.errorLoading', {
+            title: module.settingsTitle ?? module.title,
+          })
+        );
       }
     });
 

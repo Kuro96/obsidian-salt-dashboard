@@ -17,6 +17,11 @@ export interface DashboardModule {
   title: string;
 
   /**
+   * Optional display title used in settings UI.
+   */
+  settingsTitle?: string;
+
+  /**
    * Icon for the module (Lucide icon name or SVG string).
    */
   icon: string;

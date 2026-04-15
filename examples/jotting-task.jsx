@@ -44,6 +44,7 @@ const RESOURCES = {
       descending: 'Descending',
     },
     settings: {
+      moduleTitle: 'Jotting Task',
       heading: 'Jotting Task Settings',
       allowedRoots: 'Allowed root folders',
       allowedRootsDesc:
@@ -81,6 +82,7 @@ const RESOURCES = {
       descending: '降序',
     },
     settings: {
+      moduleTitle: '灵感任务',
       heading: '灵感任务设置',
       allowedRoots: '允许的根目录',
       allowedRootsDesc: '逗号分隔的根目录列表，新建任务时会依次查找第一个在 vault 中存在的目录。',
@@ -111,7 +113,7 @@ const t = key => {
 
 // ─── Default settings ─────────────────────────────────────────────────────────
 
-const MODULE_ID = 'brainattic-jotting-task';
+const MODULE_ID = 'jotting-task';
 
 const DEFAULTS = {
   allowedRoots: ['personal', 'work'],
@@ -122,6 +124,17 @@ const DEFAULTS = {
   statusFilters: ['active'],
   sortBy: 'modified',
   sortOrder: 'desc',
+};
+
+const clone = value => JSON.parse(JSON.stringify(value));
+
+const readModuleConfig = plugin => {
+  try {
+    const stored = plugin?.settings?.[MODULE_ID] ?? {};
+    return { ...clone(DEFAULTS), ...clone(stored) };
+  } catch {
+    return clone(DEFAULTS);
+  }
 };
 
 // ─── Lightweight shared-look controls ─────────────────────────────────────────
@@ -379,23 +392,44 @@ class JottingService {
     return null;
   }
 
+  _resolveTemplateFile(templatePath) {
+    const normalizedPath = templatePath?.trim();
+    if (!normalizedPath) return null;
+
+    const templateFile = this.app.vault.getAbstractFileByPath(normalizedPath);
+    if (!(templateFile instanceof TFile)) {
+      new Notice(
+        `Jotting Task: Template not found at "${normalizedPath}". Use a vault-relative file path.`
+      );
+      return null;
+    }
+
+    return templateFile;
+  }
+
   async addTask(title) {
     const root = this._resolveRoot();
     const templatePath = this.cfg.templatePath?.trim();
 
     if (templatePath) {
-      const templateFile = this.app.vault.getAbstractFileByPath(templatePath);
-      if (!(templateFile instanceof TFile)) {
-        new Notice(`Jotting Task: Template not found: ${templatePath}`);
-        return;
-      }
+      const templateFile = this._resolveTemplateFile(templatePath);
+      if (!templateFile) return;
+
       const templater = this._getTemplater();
       if (!templater) {
-        new Notice('Jotting Task: Templater plugin is not enabled.');
+        new Notice(
+          'Jotting Task: Templater plugin is not enabled. Enable it or clear templatePath.'
+        );
         return;
       }
+
       const folder = this.app.vault.getAbstractFileByPath(root) ?? this.app.vault.getRoot();
-      await templater.templater.create_new_note_from_template(templateFile, folder, title.trim());
+      try {
+        await templater.templater.create_new_note_from_template(templateFile, folder, title.trim());
+      } catch (e) {
+        console.error('Jotting Task: Templater creation failed', e);
+        new Notice(`Jotting Task: Failed to create note from template "${templatePath}".`);
+      }
       return;
     }
 
@@ -557,12 +591,18 @@ const FILTER_OPTIONS = ['active', 'done', 'archive'];
 
 const JottingTaskModule = () => {
   const plugin = useMemo(() => app.plugins?.getPlugin?.('salt-dashboard') ?? null, []);
-  const cfg = useMemo(() => {
-    try {
-      return plugin?.settings?.[MODULE_ID] ?? DEFAULTS;
-    } catch {
-      return DEFAULTS;
-    }
+  const [cfg, setCfg] = useState(() => readModuleConfig(plugin));
+
+  useEffect(() => {
+    setCfg(readModuleConfig(plugin));
+    if (!plugin?.onSettingsChange) return;
+
+    const unsubscribe = plugin.onSettingsChange(newSettings => {
+      const nextCfg = { ...clone(DEFAULTS), ...clone(newSettings?.[MODULE_ID] ?? {}) };
+      setCfg(nextCfg);
+    });
+
+    return () => unsubscribe();
   }, [plugin]);
 
   const svc = useMemo(() => new JottingService(app, cfg), [cfg]);
@@ -574,6 +614,12 @@ const JottingTaskModule = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [addText, setAddText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setFilters(cfg.statusFilters ?? DEFAULTS.statusFilters);
+    setSortBy(cfg.sortBy ?? DEFAULTS.sortBy);
+    setSortOrder(cfg.sortOrder ?? DEFAULTS.sortOrder);
+  }, [cfg]);
 
   const persistConfig = useCallback(
     async patch => {
@@ -769,7 +815,16 @@ const renderSettings = (containerEl, plugin, settings) => {
         .setPlaceholder('Templates/jotting.md')
         .setValue(cfg.templatePath ?? DEFAULTS.templatePath)
         .onChange(async v => {
-          cfg.templatePath = v.trim();
+          const nextValue = v.trim();
+          if (nextValue) {
+            const templateFile = app.vault.getAbstractFileByPath(nextValue);
+            if (!(templateFile instanceof TFile)) {
+              new Notice(
+                `Jotting Task: Template not found at "${nextValue}". Use a vault-relative file path.`
+              );
+            }
+          }
+          cfg.templatePath = nextValue;
           await plugin.saveSettings();
         })
     );
@@ -793,6 +848,7 @@ const renderSettings = (containerEl, plugin, settings) => {
 module.exports = {
   id: MODULE_ID,
   title: t('title'),
+  settingsTitle: t('settings.moduleTitle'),
   icon: 'sparkles',
   defaultSettings: { [MODULE_ID]: { ...DEFAULTS } },
   defaultLayout: { w: 4, h: 10 },
