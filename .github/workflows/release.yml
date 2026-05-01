@@ -47,7 +47,7 @@ jobs:
           zip -r obsidian-salt-dashboard.zip obsidian-salt-dashboard/
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             release_assets/main.js
