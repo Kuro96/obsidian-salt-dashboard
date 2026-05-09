@@ -124,7 +124,6 @@ export class PluginLoader {
       if (isDashboardModule(pluginModule)) {
         registry.register(pluginModule);
         this.loadedPlugins.add(pluginModule.id);
-        new Notice(`Loaded plugin: ${pluginModule.title}`);
       } else {
         console.error(`[PluginLoader] Invalid module exports in ${file.name}`);
       }
